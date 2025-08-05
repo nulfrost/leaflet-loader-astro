@@ -12,8 +12,14 @@
 		"type": "git",
 		"url": "git+https://github.com/nulfrost/leaflet-loader-astro.git"
 	},
+	"scripts": {
+		"build": "tsc"
+	},
 	"license": "MIT",
 	"files": ["dist"],
 	"type": "module",
-	"main": "dist/index.js"
+	"main": "dist/index.js",
+	"devDependencies": {
+		"typescript": "^5.9.2"
+	}
 }
