@@ -1,3 +1,5 @@
+import type { Agent } from "@atproto/api";
+
 export interface LiveLoaderOptions {
 	/**
 	 * @description Your repo is either your handle (@you.some.url) or your DID (did:plc... or did:web...). You can find this information using: https://pdsls.dev
@@ -17,4 +19,28 @@ export interface MiniDoc {
 	handle: string;
 	pds: string;
 	signing_key: string;
+}
+
+export interface CollectionFilter {
+	limit?: number;
+	reverse?: boolean;
+	cursor?: string;
+}
+
+export interface EntryFilter {
+	id?: string;
+}
+
+export interface GetLeafletDocumentsParams {
+	repo: string;
+	agent: Agent;
+	cursor?: string;
+	limit?: number;
+	reverse?: boolean;
+}
+
+export interface GetSingleLeafletDocumentParams {
+	repo: string;
+	agent: Agent;
+	id: string;
 }

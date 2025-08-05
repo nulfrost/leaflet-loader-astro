@@ -1,6 +1,10 @@
 import type { Agent } from "@atproto/api";
-import type { MiniDoc } from "./types.js";
-import { LiveLoaderError } from "./loader.js";
+import type {
+	GetLeafletDocumentsParams,
+	GetSingleLeafletDocumentParams,
+	MiniDoc,
+} from "./types.js";
+import { LiveLoaderError } from "./leaflet-live-loader.js";
 
 export function uriToRkey(uri: string) {
 	const rkey = uri.split("/").pop();
@@ -29,16 +33,46 @@ export async function resolveMiniDoc(handleOrDid: string) {
 	}
 }
 
-export async function getLeafletDocuments(repo: string, agent: Agent) {
+export async function getLeafletDocuments({
+	repo,
+	reverse,
+	cursor,
+	agent,
+	limit,
+}: GetLeafletDocumentsParams) {
 	const response = await agent.com.atproto.repo.listRecords({
 		repo,
 		collection: "pub.leaflet.document",
+		cursor,
+		reverse,
+		limit,
 	});
 
 	if (response.success === false) {
 		throw new LiveLoaderError(
 			"Could not fetch leaflet documents",
 			"FETCH_FAILED",
+		);
+	}
+
+	return response?.data?.records;
+}
+
+export async function getSingleLeafletDocument({
+	agent,
+	repo,
+	id,
+}: GetSingleLeafletDocumentParams) {
+	const response = await agent.com.atproto.repo.getRecord({
+		repo,
+		collection: "pub.leaflet.document",
+		rkey: id,
+	});
+
+	if (response.success === false) {
+		throw new LiveLoaderError(
+			"error fetching document",
+			"DOCUMENT_FETCH_ERROR",
 		);
 	}
 
