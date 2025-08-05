@@ -12,6 +12,7 @@
 		"type": "git",
 		"url": "git+https://github.com/nulfrost/leaflet-loader-astro.git"
 	},
+	"license": "MIT",
 	"files": ["dist"],
 	"type": "module",
 	"main": "dist/index.js"
