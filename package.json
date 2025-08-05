@@ -2,7 +2,12 @@
 	"name": "leaflet-loader-astro",
 	"version": "0.0.1",
 	"description": "A leaflet.pub astro collection loader",
-	"keywords": ["astro", "at", "protocol", "leaflet.pub"],
+	"keywords": [
+		"astro",
+		"at",
+		"protocol",
+		"leaflet.pub"
+	],
 	"homepage": "https://github.com/nulfrost/leaflet-loader-astro",
 	"bugs": {
 		"url": "https://github.com/nulfrost/leaflet-loader-astro/issues"
@@ -16,10 +21,20 @@
 		"build": "tsc"
 	},
 	"license": "MIT",
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"type": "module",
 	"main": "dist/index.js",
 	"devDependencies": {
-		"typescript": "^5.9.2"
+		"astro": "^5.12.8",
+		"tsup": "^8.5.0",
+		"typescript": "^5.9.2",
+		"vitest": "^3.2.4"
+	},
+	"dependencies": {
+		"@atproto/api": "^0.16.1",
+		"@atproto/did": "^0.1.5",
+		"@atproto/syntax": "^0.4.0"
 	}
 }
