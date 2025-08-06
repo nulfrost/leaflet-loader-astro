@@ -1,6 +1,5 @@
 import { Agent } from "@atproto/api";
 import { isDid } from "@atproto/did";
-import { isValidHandle } from "@atproto/syntax";
 import type { LiveLoader } from "astro/loaders";
 import type {
 	CollectionFilter,
