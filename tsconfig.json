@@ -17,6 +17,7 @@
 		"moduleResolution": "bundler",
 		"rootDir": "src",
 		"sourceMap": true,
+		"noEmit": true,
 		"declaration": true
 	},
 	"include": ["./src"],

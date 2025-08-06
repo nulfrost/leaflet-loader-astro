@@ -22,8 +22,8 @@
 		"format": "biome format --write ./src",
 		"test": "vitest --run",
 		"lex-gen": "lex gen-api ./src/leaflet/lexicons ./lexicons/pub/leaflet/* ./lexicons/pub/leaflet/*/* ./lexicons/com/atproto/*/* --yes",
-		"typecheck": "tsc --noEmit",
-		"build": "rm -rf dist && tsc"
+		"typecheck": "tsc",
+		"build": "rm -rf dist && tsup"
 	},
 	"license": "MIT",
 	"files": [
@@ -31,6 +31,12 @@
 	],
 	"type": "module",
 	"main": "dist/index.js",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		}
+	},
 	"devDependencies": {
 		"@atproto/lex-cli": "^0.9.1",
 		"@biomejs/biome": "2.1.3",
