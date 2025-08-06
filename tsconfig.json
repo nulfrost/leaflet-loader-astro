@@ -12,14 +12,14 @@
 		"noUncheckedIndexedAccess": true,
 		"noImplicitOverride": true,
 		"module": "nodenext",
-		"baseUrl": "./src",
+		"baseUrl": "lib",
 		"outDir": "dist",
 		"moduleResolution": "nodenext",
-		"rootDir": "src",
+		"rootDir": "lib",
 		"sourceMap": true,
 		"noEmit": true,
 		"declaration": true
 	},
-	"include": ["./src"],
-	"exclude": ["node_modules", "dist"]
+	"include": ["lib"],
+	"exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

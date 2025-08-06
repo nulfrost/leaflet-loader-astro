@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { uriToRkey } from "../utils";
+import { uriToRkey } from "../lib/utils";
 
 test("should throw if invalid at uri is passed in", () => {
 	expect(() => uriToRkey("test")).toThrowError("get rkey");
