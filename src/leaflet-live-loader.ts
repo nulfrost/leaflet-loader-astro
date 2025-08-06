@@ -39,19 +39,14 @@ export function leafletLiveLoader(
 
 	if (!repo || typeof repo !== "string") {
 		throw new LiveLoaderError(
-			"missing or invalid handle or did",
-			"MISSING_OR_INVALID_HANDLE_OR_DID",
+			"missing or invalid did",
+			"MISSING_OR_INVALID_DID",
 		);
 	}
 
-	if (!isValidHandle(repo)) {
-		// not a valid handle, let's check if it's a valid did
-		if (!isDid(repo)) {
-			throw new LiveLoaderError(
-				"invalid handle or did",
-				"INVALID_HANDLE_OR_DID",
-			);
-		}
+	// not a valid handle, let's check if it's a valid did
+	if (!isDid(repo)) {
+		throw new LiveLoaderError("invalid did", "INVALID_DID");
 	}
 
 	return {
