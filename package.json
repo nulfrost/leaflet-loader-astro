@@ -18,6 +18,8 @@
 		"url": "git+https://github.com/nulfrost/leaflet-loader-astro.git"
 	},
 	"scripts": {
+		"lex-gen": "lex gen-api ./src/__generated__/lexicons ./lexicons/pub/leaflet/* ./lexicons/pub/leaflet/*/* ./lexicons/com/atproto/*/* --yes",
+		"typecheck": "tsc --noEmit",
 		"build": "tsc"
 	},
 	"license": "MIT",
@@ -27,6 +29,8 @@
 	"type": "module",
 	"main": "dist/index.js",
 	"devDependencies": {
+		"@atproto/lex-cli": "^0.9.1",
+		"@types/sanitize-html": "^2.16.0",
 		"astro": "^5.12.8",
 		"tsup": "^8.5.0",
 		"typescript": "^5.9.2",
@@ -35,6 +39,7 @@
 	"dependencies": {
 		"@atproto/api": "^0.16.1",
 		"@atproto/did": "^0.1.5",
-		"@atproto/syntax": "^0.4.0"
+		"@atproto/syntax": "^0.4.0",
+		"sanitize-html": "^2.17.0"
 	}
 }

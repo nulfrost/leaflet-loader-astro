@@ -27,14 +27,6 @@ export class LiveLoaderError extends Error {
 	}
 }
 
-/**
- * Flow:
- * - Check for valid handle or did [done]
- * - Resolve PDS url from handle or did [done, thanks Phil!]
- * - Fetch leaflet documents [done]
- * - Find out how to use leaflet types here
- */
-
 export function leafletLiveLoader(
 	options: LeafletLoaderOptions,
 ): LiveLoader<

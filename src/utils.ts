@@ -1,11 +1,22 @@
 import type {
+	Facet,
 	GetLeafletDocumentsParams,
 	GetSingleLeafletDocumentParams,
 	LeafletDocumentRecord,
 	LeafletDocumentView,
 	MiniDoc,
+	RichTextSegment,
 } from "./types.js";
 import { LiveLoaderError } from "./leaflet-live-loader.js";
+import { UnicodeString } from "@atproto/api";
+import sanitizeHTML from "sanitize-html";
+import {
+	PubLeafletBlocksHeader,
+	PubLeafletBlocksText,
+	type PubLeafletDocument,
+	PubLeafletPagesLinearDocument,
+	PubLeafletRichtextFacet,
+} from "./__generated__/lexicons/index.js";
 
 export function uriToRkey(uri: string): string {
 	const rkey = uri.split("/").pop();
@@ -99,4 +110,152 @@ export function leafletDocumentRecordToView({
 		publication: value.publication,
 		publishedAt: value.publishedAt,
 	};
+}
+
+export function leafletBlocksToHTML(record: {
+	id: string;
+	uri: string;
+	cid: string;
+	value: PubLeafletDocument.Record;
+}) {
+	let html = "";
+	const firstPage = record.value.pages[0];
+	let blocks: PubLeafletPagesLinearDocument.Block[] = [];
+	if (PubLeafletPagesLinearDocument.isMain(firstPage)) {
+		blocks = firstPage.blocks || [];
+	}
+
+	for (const block of blocks) {
+		if (PubLeafletBlocksText.isMain(block.block)) {
+			const rt = new RichText({
+				text: block.block.plaintext,
+				facets: block.block.facets || [],
+			});
+			const children = [];
+			for (const segment of rt.segments()) {
+				const link = segment.facet?.find(PubLeafletRichtextFacet.isLink);
+				const isBold = segment.facet?.find(PubLeafletRichtextFacet.isBold);
+				const isCode = segment.facet?.find(PubLeafletRichtextFacet.isCode);
+				const isStrikethrough = segment.facet?.find(
+					PubLeafletRichtextFacet.isStrikethrough,
+				);
+				const isUnderline = segment.facet?.find(
+					PubLeafletRichtextFacet.isUnderline,
+				);
+				const isItalic = segment.facet?.find(PubLeafletRichtextFacet.isItalic);
+				if (isCode) {
+					children.push(` <code>
+          ${segment.text}
+        </code>`);
+				} else if (link) {
+					children.push(
+						` <a
+          href="${link.uri}"
+          target="_blank"
+        >
+          ${segment.text}
+        </a>`,
+					);
+				} else if (isBold) {
+					children.push(`<b>${segment.text}</b>`);
+				} else if (isStrikethrough) {
+					children.push(`<s>${segment.text}</s>`);
+				} else if (isUnderline) {
+					children.push(
+						`<span style="text-decoration:underline;">${segment.text}</span>`,
+					);
+				} else if (isItalic) {
+					children.push(`<i>${segment.text}</i>`);
+				} else {
+					children.push(
+						`
+          ${segment.text}
+       `,
+					);
+				}
+			}
+			html += `<p>${children.join("\n")}</p>`;
+		}
+
+		if (PubLeafletBlocksHeader.isMain(block.block)) {
+			if (block.block.level === 1) {
+				html += `<h2>${block.block.plaintext}</h2>`;
+			}
+		}
+		if (PubLeafletBlocksHeader.isMain(block.block)) {
+			if (block.block.level === 2) {
+				html += `<h3>${block.block.plaintext}</h3>`;
+			}
+		}
+		if (PubLeafletBlocksHeader.isMain(block.block)) {
+			if (block.block.level === 3) {
+				html += `<h4>${block.block.plaintext}</h4>`;
+			}
+		}
+		if (PubLeafletBlocksHeader.isMain(block.block)) {
+			if (!block.block.level) {
+				html += `<h6>${block.block.plaintext}</h6>`;
+			}
+		}
+	}
+
+	return sanitizeHTML(html);
+}
+
+export class RichText {
+	unicodeText: UnicodeString;
+	facets?: Facet[];
+
+	constructor(props: { text: string; facets: Facet[] }) {
+		this.unicodeText = new UnicodeString(props.text);
+		this.facets = props.facets;
+		if (this.facets) {
+			this.facets = this.facets
+				.filter((facet) => facet.index.byteStart <= facet.index.byteEnd)
+				.sort((a, b) => a.index.byteStart - b.index.byteStart);
+		}
+	}
+
+	*segments(): Generator<RichTextSegment, void, void> {
+		const facets = this.facets || [];
+		if (!facets.length) {
+			yield { text: this.unicodeText.utf16 };
+			return;
+		}
+
+		let textCursor = 0;
+		let facetCursor = 0;
+		do {
+			const currFacet = facets[facetCursor];
+			if (currFacet) {
+				if (textCursor < currFacet.index.byteStart) {
+					yield {
+						text: this.unicodeText.slice(textCursor, currFacet.index.byteStart),
+					};
+				} else if (textCursor > currFacet.index.byteStart) {
+					facetCursor++;
+					continue;
+				}
+				if (currFacet.index.byteStart < currFacet.index.byteEnd) {
+					const subtext = this.unicodeText.slice(
+						currFacet.index.byteStart,
+						currFacet.index.byteEnd,
+					);
+					if (!subtext.trim()) {
+						// dont empty string entities
+						yield { text: subtext };
+					} else {
+						yield { text: subtext, facet: currFacet.features };
+					}
+				}
+				textCursor = currFacet.index.byteEnd;
+				facetCursor++;
+			}
+		} while (facetCursor < facets.length);
+		if (textCursor < this.unicodeText.length) {
+			yield {
+				text: this.unicodeText.slice(textCursor, this.unicodeText.length),
+			};
+		}
+	}
 }

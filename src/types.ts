@@ -1,4 +1,5 @@
 import type { Agent } from "@atproto/api";
+import type { PubLeafletRichtextFacet } from "./__generated__/lexicons/index.js";
 
 export interface LeafletLoaderOptions {
 	/**
@@ -57,4 +58,10 @@ export interface GetSingleLeafletDocumentParams {
 	repo: string;
 	agent: Agent;
 	id: string;
+}
+
+export interface Facet extends PubLeafletRichtextFacet.Main {}
+export interface RichTextSegment {
+	text: string;
+	facet?: Exclude<Facet["features"], { $type: string }>;
 }
