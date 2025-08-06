@@ -43,7 +43,7 @@ export function leafletLiveLoader(
 		);
 	}
 
-	// not a valid handle, let's check if it's a valid did
+	// not a valid did
 	if (!isDid(repo)) {
 		throw new LiveLoaderError("invalid did", "INVALID_DID");
 	}
