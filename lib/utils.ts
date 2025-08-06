@@ -1,7 +1,6 @@
 import { is } from "@atcute/lexicons";
 import { AtUri, UnicodeString } from "@atproto/api";
 import sanitizeHTML from "sanitize-html";
-import { LiveLoaderError } from "./leaflet-live-loader.js";
 import {
 	PubLeafletBlocksHeader,
 	PubLeafletBlocksText,
@@ -17,6 +16,16 @@ import type {
 	MiniDoc,
 	RichTextSegment,
 } from "./types.js";
+
+export class LiveLoaderError extends Error {
+	constructor(
+		message: string,
+		public code?: string,
+	) {
+		super(message);
+		this.name = "LiveLoaderError";
+	}
+}
 
 export function uriToRkey(uri: string): string {
 	const u = AtUri.make(uri);
@@ -62,8 +71,8 @@ export async function getLeafletDocuments({
 
 	if (response.success === false) {
 		throw new LiveLoaderError(
-			"Could not fetch leaflet documents",
-			"FETCH_FAILED",
+			"error fetching leaflet documents",
+			"DOCUMENT_FETCH_ERROR",
 		);
 	}
 
@@ -83,7 +92,7 @@ export async function getSingleLeafletDocument({
 
 	if (response.success === false) {
 		throw new LiveLoaderError(
-			"error fetching document",
+			"error fetching single document",
 			"DOCUMENT_FETCH_ERROR",
 		);
 	}

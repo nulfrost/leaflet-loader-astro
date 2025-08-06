@@ -23,7 +23,8 @@
 		"lex": "lex-cli generate -c ./lex.config.js",
 		"test": "vitest --run",
 		"typecheck": "tsc",
-		"build": "rm -rf dist && tsup"
+		"build": "rm -rf dist && tsup",
+		"pack": "pnpm build && pnpm pack"
 	},
 	"license": "MIT",
 	"files": [

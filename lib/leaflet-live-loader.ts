@@ -12,19 +12,10 @@ import {
 	getLeafletDocuments,
 	getSingleLeafletDocument,
 	leafletDocumentRecordToView,
+	LiveLoaderError,
 	resolveMiniDoc,
 	uriToRkey,
 } from "./utils.js";
-
-export class LiveLoaderError extends Error {
-	constructor(
-		message: string,
-		public code?: string,
-	) {
-		super(message);
-		this.name = "LiveLoaderError";
-	}
-}
 
 export function leafletLiveLoader(
 	options: LeafletLoaderOptions,
@@ -86,15 +77,15 @@ export function leafletLiveLoader(
 			}
 		},
 		loadEntry: async ({ filter }) => {
+			if (!filter.id) {
+				return {
+					error: new LiveLoaderError(
+						"must provide an id for specific document",
+						"MISSING_DOCUMENT_ID",
+					),
+				};
+			}
 			try {
-				if (!filter.id) {
-					return {
-						error: new LiveLoaderError(
-							"must provide an id for specific document",
-							"MISSING_DOCUMENT_ID",
-						),
-					};
-				}
 				const pds_url = await resolveMiniDoc(repo);
 				const agent = new Agent({ service: pds_url });
 				const document = await getSingleLeafletDocument({
