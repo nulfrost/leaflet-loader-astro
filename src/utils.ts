@@ -1,7 +1,8 @@
-import type { Agent } from "@atproto/api";
 import type {
 	GetLeafletDocumentsParams,
 	GetSingleLeafletDocumentParams,
+	LeafletDocumentRecord,
+	LeafletDocumentView,
 	MiniDoc,
 } from "./types.js";
 import { LiveLoaderError } from "./leaflet-live-loader.js";
@@ -77,4 +78,25 @@ export async function getSingleLeafletDocument({
 	}
 
 	return response?.data;
+}
+
+export function leafletDocumentRecordToView({
+	uri,
+	cid,
+	value,
+}: {
+	uri: string;
+	cid: string;
+	value: LeafletDocumentRecord;
+}): LeafletDocumentView {
+	return {
+		rkey: uriToRkey(uri),
+		cid,
+		title: value.title,
+		pages: value.pages,
+		description: value.description,
+		author: value.author,
+		publication: value.publication,
+		publishedAt: value.publishedAt,
+	};
 }

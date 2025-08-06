@@ -5,13 +5,15 @@ import { isValidHandle } from "@atproto/syntax";
 import {
 	getLeafletDocuments,
 	getSingleLeafletDocument,
+	leafletDocumentRecordToView,
 	resolveMiniDoc,
 	uriToRkey,
 } from "./utils.js";
 import type {
 	CollectionFilter,
 	EntryFilter,
-	LeafletRecord,
+	LeafletDocumentRecord,
+	LeafletDocumentView,
 	LeafletLoaderOptions,
 } from "./types.js";
 
@@ -35,7 +37,12 @@ export class LiveLoaderError extends Error {
 
 export function leafletLiveLoader(
 	options: LeafletLoaderOptions,
-): LiveLoader<LeafletRecord, EntryFilter, CollectionFilter, LiveLoaderError> {
+): LiveLoader<
+	LeafletDocumentView,
+	EntryFilter,
+	CollectionFilter,
+	LiveLoaderError
+> {
 	const { repo } = options;
 
 	if (!repo || typeof repo !== "string") {
@@ -75,10 +82,11 @@ export function leafletLiveLoader(
 						const id = uriToRkey(document.uri);
 						return {
 							id,
-							data: {
-								id,
-								...document,
-							},
+							data: leafletDocumentRecordToView({
+								uri: document.uri,
+								cid: document.cid,
+								value: document.value as unknown as LeafletDocumentRecord,
+							}),
 						};
 					}),
 				};
@@ -110,11 +118,12 @@ export function leafletLiveLoader(
 				});
 
 				return {
-					id: filter?.id,
-					data: {
-						id: filter?.id,
-						...document,
-					},
+					id: filter.id,
+					data: leafletDocumentRecordToView({
+						uri: document.uri,
+						cid: document.cid?.toString() ?? "",
+						value: document.value as unknown as LeafletDocumentRecord,
+					}),
 				};
 			} catch {
 				return {

@@ -7,11 +7,25 @@ export interface LeafletLoaderOptions {
 	repo: string;
 }
 
-export interface LeafletRecord {
-	id: string;
-	uri: string;
-	cid?: string;
-	value: unknown;
+export interface LeafletDocumentRecord {
+	$type: "pub.leaflet.document";
+	pages: { [x: string]: unknown };
+	title: string;
+	author: string;
+	description: string;
+	publication: string;
+	publishedAt: string;
+}
+
+export interface LeafletDocumentView {
+	rkey: string;
+	cid: string;
+	title: string;
+	pages: { [x: string]: unknown };
+	description: string;
+	author: string;
+	publication: string;
+	publishedAt: string;
 }
 
 export interface MiniDoc {
