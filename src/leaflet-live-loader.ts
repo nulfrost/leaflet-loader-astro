@@ -1,14 +1,7 @@
-import type { LiveLoader } from "astro/loaders";
 import { Agent } from "@atproto/api";
 import { isDid } from "@atproto/did";
 import { isValidHandle } from "@atproto/syntax";
-import {
-	getLeafletDocuments,
-	getSingleLeafletDocument,
-	leafletDocumentRecordToView,
-	resolveMiniDoc,
-	uriToRkey,
-} from "./utils.js";
+import type { LiveLoader } from "astro/loaders";
 import type {
 	CollectionFilter,
 	EntryFilter,
@@ -16,6 +9,13 @@ import type {
 	LeafletDocumentView,
 	LeafletLoaderOptions,
 } from "./types.js";
+import {
+	getLeafletDocuments,
+	getSingleLeafletDocument,
+	leafletDocumentRecordToView,
+	resolveMiniDoc,
+	uriToRkey,
+} from "./utils.js";
 
 export class LiveLoaderError extends Error {
 	constructor(
@@ -82,7 +82,7 @@ export function leafletLiveLoader(
 						};
 					}),
 				};
-			} catch (error) {
+			} catch {
 				return {
 					error: new LiveLoaderError(
 						"could not recover from error, please report on github",

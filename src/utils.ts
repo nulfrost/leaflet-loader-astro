@@ -1,13 +1,3 @@
-import type {
-	Facet,
-	GetLeafletDocumentsParams,
-	GetSingleLeafletDocumentParams,
-	LeafletDocumentRecord,
-	LeafletDocumentView,
-	MiniDoc,
-	RichTextSegment,
-} from "./types.js";
-import { LiveLoaderError } from "./leaflet-live-loader.js";
 import { UnicodeString } from "@atproto/api";
 import sanitizeHTML from "sanitize-html";
 import {
@@ -17,6 +7,16 @@ import {
 	PubLeafletPagesLinearDocument,
 	PubLeafletRichtextFacet,
 } from "./__generated__/lexicons/index.js";
+import { LiveLoaderError } from "./leaflet-live-loader.js";
+import type {
+	Facet,
+	GetLeafletDocumentsParams,
+	GetSingleLeafletDocumentParams,
+	LeafletDocumentRecord,
+	LeafletDocumentView,
+	MiniDoc,
+	RichTextSegment,
+} from "./types.js";
 
 export function uriToRkey(uri: string): string {
 	const rkey = uri.split("/").pop();
@@ -40,7 +40,7 @@ export async function resolveMiniDoc(handleOrDid: string) {
 		const data = (await response.json()) as MiniDoc;
 
 		return data.pds;
-	} catch (error) {
+	} catch {
 		throw new Error(`failed to resolve handle: ${handleOrDid}`);
 	}
 }
