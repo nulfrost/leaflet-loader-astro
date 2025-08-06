@@ -12,7 +12,7 @@ import type {
 	CollectionFilter,
 	EntryFilter,
 	LeafletRecord,
-	LiveLoaderOptions,
+	LeafletLoaderOptions,
 } from "./types.js";
 
 export class LiveLoaderError extends Error {
@@ -34,7 +34,7 @@ export class LiveLoaderError extends Error {
  */
 
 export function leafletLiveLoader(
-	options: LiveLoaderOptions,
+	options: LeafletLoaderOptions,
 ): LiveLoader<LeafletRecord, EntryFilter, CollectionFilter, LiveLoaderError> {
 	const { repo } = options;
 
@@ -56,25 +56,31 @@ export function leafletLiveLoader(
 	}
 
 	return {
-		name: "leaflet-live-loader",
+		name: "leaflet-loader-astro",
 		loadCollection: async ({ filter }) => {
 			try {
 				const pds_url = await resolveMiniDoc(repo);
 				const agent = new Agent({ service: pds_url });
 
 				const documents = await getLeafletDocuments({
-					repo,
 					agent,
+					repo,
+					reverse: filter?.reverse,
 					cursor: filter?.cursor,
 					limit: filter?.limit,
-					reverse: filter?.reverse,
 				});
 
 				return {
-					entries: documents.map((document) => ({
-						id: uriToRkey(document.uri),
-						data: document,
-					})),
+					entries: documents.map((document) => {
+						const id = uriToRkey(document.uri);
+						return {
+							id,
+							data: {
+								id,
+								...document,
+							},
+						};
+					}),
 				};
 			} catch (error) {
 				return {
@@ -104,8 +110,11 @@ export function leafletLiveLoader(
 				});
 
 				return {
-					id: uriToRkey(document.data.uri),
-					data: document.data.value,
+					id: filter?.id,
+					data: {
+						id: filter?.id,
+						...document,
+					},
 				};
 			} catch {
 				return {

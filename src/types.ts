@@ -1,6 +1,6 @@
 import type { Agent } from "@atproto/api";
 
-export interface LiveLoaderOptions {
+export interface LeafletLoaderOptions {
 	/**
 	 * @description Your repo is either your handle (@you.some.url) or your DID (did:plc... or did:web...). You can find this information using: https://pdsls.dev
 	 */
@@ -10,7 +10,7 @@ export interface LiveLoaderOptions {
 export interface LeafletRecord {
 	id: string;
 	uri: string;
-	cid: string;
+	cid?: string;
 	value: unknown;
 }
 

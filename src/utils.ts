@@ -6,7 +6,7 @@ import type {
 } from "./types.js";
 import { LiveLoaderError } from "./leaflet-live-loader.js";
 
-export function uriToRkey(uri: string) {
+export function uriToRkey(uri: string): string {
 	const rkey = uri.split("/").pop();
 	if (!rkey) {
 		throw new Error("Failed to get rkey from uri.");
@@ -76,5 +76,5 @@ export async function getSingleLeafletDocument({
 		);
 	}
 
-	return response;
+	return response?.data;
 }
