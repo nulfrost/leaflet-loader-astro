@@ -1,4 +1,4 @@
-import { UnicodeString } from "@atproto/api";
+import { AtUri, UnicodeString } from "@atproto/api";
 import sanitizeHTML from "sanitize-html";
 import {
 	PubLeafletBlocksHeader,
@@ -19,11 +19,11 @@ import type {
 } from "./types.js";
 
 export function uriToRkey(uri: string): string {
-	const rkey = uri.split("/").pop();
-	if (!rkey) {
+	const u = AtUri.make(uri);
+	if (!u.rkey) {
 		throw new Error("Failed to get rkey from uri.");
 	}
-	return rkey;
+	return u.rkey;
 }
 
 export async function resolveMiniDoc(handleOrDid: string) {

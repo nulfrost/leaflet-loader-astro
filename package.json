@@ -20,6 +20,7 @@
 	"scripts": {
 		"lint": "biome lint",
 		"format": "biome format --write ./src",
+		"test": "vitest --run",
 		"lex-gen": "lex gen-api ./src/leaflet/lexicons ./lexicons/pub/leaflet/* ./lexicons/pub/leaflet/*/* ./lexicons/com/atproto/*/* --yes",
 		"typecheck": "tsc --noEmit",
 		"build": "rm -rf dist && tsc"
