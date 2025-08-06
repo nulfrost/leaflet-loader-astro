@@ -1,13 +1,13 @@
+import { is } from "@atcute/lexicons";
 import { AtUri, UnicodeString } from "@atproto/api";
 import sanitizeHTML from "sanitize-html";
+import { LiveLoaderError } from "./leaflet-live-loader.js";
 import {
 	PubLeafletBlocksHeader,
 	PubLeafletBlocksText,
 	type PubLeafletDocument,
 	PubLeafletPagesLinearDocument,
-	PubLeafletRichtextFacet,
-} from "./leaflet/lexicons/index.js";
-import { LiveLoaderError } from "./leaflet-live-loader.js";
+} from "./lexicons/index.js";
 import type {
 	Facet,
 	GetLeafletDocumentsParams,
@@ -116,33 +116,42 @@ export function leafletBlocksToHTML(record: {
 	id: string;
 	uri: string;
 	cid: string;
-	value: PubLeafletDocument.Record;
+	value: PubLeafletDocument.Main;
 }) {
 	let html = "";
 	const firstPage = record.value.pages[0];
 	let blocks: PubLeafletPagesLinearDocument.Block[] = [];
-	if (PubLeafletPagesLinearDocument.isMain(firstPage)) {
+	if (is(PubLeafletPagesLinearDocument.mainSchema, firstPage)) {
 		blocks = firstPage.blocks || [];
 	}
 
 	for (const block of blocks) {
-		if (PubLeafletBlocksText.isMain(block.block)) {
+		if (is(PubLeafletBlocksText.mainSchema, block.block)) {
 			const rt = new RichText({
 				text: block.block.plaintext,
 				facets: block.block.facets || [],
 			});
 			const children = [];
 			for (const segment of rt.segments()) {
-				const link = segment.facet?.find(PubLeafletRichtextFacet.isLink);
-				const isBold = segment.facet?.find(PubLeafletRichtextFacet.isBold);
-				const isCode = segment.facet?.find(PubLeafletRichtextFacet.isCode);
+				const link = segment.facet?.find(
+					(segment) => segment.$type === "pub.leaflet.richtext.facet#link",
+				);
+				const isBold = segment.facet?.find(
+					(segment) => segment.$type === "pub.leaflet.richtext.facet#bold",
+				);
+				const isCode = segment.facet?.find(
+					(segment) => segment.$type === "pub.leaflet.richtext.facet#code",
+				);
 				const isStrikethrough = segment.facet?.find(
-					PubLeafletRichtextFacet.isStrikethrough,
+					(segment) =>
+						segment.$type === "pub.leaflet.richtext.facet#strikethrough",
 				);
 				const isUnderline = segment.facet?.find(
-					PubLeafletRichtextFacet.isUnderline,
+					(segment) => segment.$type === "pub.leaflet.richtext.facet#underline",
 				);
-				const isItalic = segment.facet?.find(PubLeafletRichtextFacet.isItalic);
+				const isItalic = segment.facet?.find(
+					(segment) => segment.$type === "pub.leaflet.richtext.facet#italic",
+				);
 				if (isCode) {
 					children.push(` <code>
           ${segment.text}
@@ -177,22 +186,22 @@ export function leafletBlocksToHTML(record: {
 			html += `<p>${children.join("\n")}</p>`;
 		}
 
-		if (PubLeafletBlocksHeader.isMain(block.block)) {
+		if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
 			if (block.block.level === 1) {
 				html += `<h2>${block.block.plaintext}</h2>`;
 			}
 		}
-		if (PubLeafletBlocksHeader.isMain(block.block)) {
+		if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
 			if (block.block.level === 2) {
 				html += `<h3>${block.block.plaintext}</h3>`;
 			}
 		}
-		if (PubLeafletBlocksHeader.isMain(block.block)) {
+		if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
 			if (block.block.level === 3) {
 				html += `<h4>${block.block.plaintext}</h4>`;
 			}
 		}
-		if (PubLeafletBlocksHeader.isMain(block.block)) {
+		if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
 			if (!block.block.level) {
 				html += `<h6>${block.block.plaintext}</h6>`;
 			}
