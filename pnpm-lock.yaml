@@ -14,9 +14,18 @@ importers:
       '@atproto/did':
         specifier: ^0.1.5
         version: 0.1.5
+      '@atproto/lexicon':
+        specifier: ^0.4.12
+        version: 0.4.12
       '@atproto/syntax':
         specifier: ^0.4.0
         version: 0.4.0
+      '@atproto/xrpc':
+        specifier: ^0.7.1
+        version: 0.7.1
+      multiformats:
+        specifier: ^13.4.0
+        version: 13.4.0
       sanitize-html:
         specifier: ^2.17.0
         version: 2.17.0
@@ -1315,6 +1324,9 @@ packages:
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
+
+  multiformats@13.4.0:
+    resolution: {integrity: sha512-Mkb/QcclrJxKC+vrcIFl297h52QcKh2Az/9A5vbWytbQt4225UWWWmIuSsKksdww9NkIeYcA7DkfftyLuC/JSg==}
 
   multiformats@9.9.0:
     resolution: {integrity: sha512-HoMUjhH9T8DDBNT+6xzkrd9ga/XiBI4xLr58LJACwK6G3HTOPeMz4nB4KJs33L2BelrIJa7P0VuNaVF3hMYfjg==}
@@ -3554,6 +3566,8 @@ snapshots:
   mrmime@2.0.1: {}
 
   ms@2.1.3: {}
+
+  multiformats@13.4.0: {}
 
   multiformats@9.9.0: {}
 

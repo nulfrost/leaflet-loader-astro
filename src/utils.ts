@@ -6,7 +6,7 @@ import {
 	type PubLeafletDocument,
 	PubLeafletPagesLinearDocument,
 	PubLeafletRichtextFacet,
-} from "./__generated__/lexicons/index.js";
+} from "./leaflet/lexicons/index.js";
 import { LiveLoaderError } from "./leaflet-live-loader.js";
 import type {
 	Facet,

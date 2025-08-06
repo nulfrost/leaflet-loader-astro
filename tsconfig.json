@@ -6,17 +6,19 @@
 		"lib": ["es2022"],
 		"target": "es2022",
 		"allowJs": true,
-		"resolveJsonModule": true,
 		"moduleDetection": "force",
 		"isolatedModules": true,
-		"verbatimModuleSyntax": true,
 		"strict": true,
 		"noUncheckedIndexedAccess": true,
 		"noImplicitOverride": true,
-		"module": "NodeNext",
+		"module": "esnext",
+		"baseUrl": "./src",
 		"outDir": "dist",
+		"moduleResolution": "bundler",
 		"rootDir": "src",
 		"sourceMap": true,
 		"declaration": true
-	}
+	},
+	"include": ["./src"],
+	"exclude": ["node_modules", "dist"]
 }

@@ -1,5 +1,5 @@
 import type { Agent } from "@atproto/api";
-import type { PubLeafletRichtextFacet } from "./__generated__/lexicons/index.js";
+import type { PubLeafletRichtextFacet } from "./leaflet/lexicons/index.js";
 
 export interface LeafletLoaderOptions {
 	/**
