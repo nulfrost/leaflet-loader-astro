@@ -1,5 +1,5 @@
 {
-	"name": "leaflet-loader-astro",
+	"name": "@nulfrost/leaflet-loader-astro",
 	"version": "1.0.0",
 	"description": "A leaflet.pub astro collection loader",
 	"keywords": [
