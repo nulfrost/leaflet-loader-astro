@@ -23,6 +23,7 @@
 		"lex": "lex-cli generate -c ./lex.config.js",
 		"test": "vitest --run",
 		"typecheck": "tsc",
+		"release": "pnpm run build && changeset publish",
 		"build": "rm -rf dist && tsup --format esm --dts",
 		"pack": "pnpm build && pnpm pack"
 	},
