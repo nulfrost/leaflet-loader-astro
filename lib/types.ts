@@ -1,11 +1,23 @@
 import type { Agent } from "@atproto/api";
 import type { PubLeafletRichtextFacet } from "./lexicons/index.js";
 
-export interface LeafletLoaderOptions {
+export interface LiveLeafletLoaderOptions {
 	/**
-	 * @description Your repo is either your handle (@you.some.url) or your DID (did:plc... or did:web...). You can find this information using: https://pdsls.dev
+	 * @description Your repo is your DID (did:plc... or did:web...). You can find this information using: https://pdsls.dev
 	 */
 	repo: string;
+}
+
+export interface StaticLeafletLoaderOptions {
+	/**
+	 * @description Your repo is your DID (did:plc... or did:web...). You can find this information using: https://pdsls.dev
+	 */
+	repo: string;
+	filter?: string;
+	/**
+	 * @default 50
+	 */
+	limit?: number;
 }
 
 export interface LeafletDocumentRecord {
@@ -22,7 +34,6 @@ export interface LeafletDocumentView {
 	rkey: string;
 	cid: string;
 	title: string;
-	pages: { [x: string]: unknown };
 	description: string;
 	author: string;
 	publication: string;

@@ -19,7 +19,7 @@
 	},
 	"scripts": {
 		"lint": "biome lint",
-		"format": "biome format --write ./src",
+		"format": "biome format --write ./lib",
 		"lex": "lex-cli generate -c ./lex.config.js",
 		"test": "vitest --run",
 		"typecheck": "tsc",

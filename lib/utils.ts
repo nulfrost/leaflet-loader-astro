@@ -4,7 +4,6 @@ import sanitizeHTML from "sanitize-html";
 import {
 	PubLeafletBlocksHeader,
 	PubLeafletBlocksText,
-	type PubLeafletDocument,
 	PubLeafletPagesLinearDocument,
 } from "./lexicons/index.js";
 import type {
@@ -76,7 +75,10 @@ export async function getLeafletDocuments({
 		);
 	}
 
-	return response?.data?.records;
+	return {
+		documents: response?.data?.records,
+		cursor: response?.data?.cursor,
+	};
 }
 
 export async function getSingleLeafletDocument({
@@ -113,7 +115,6 @@ export function leafletDocumentRecordToView({
 		rkey: uriToRkey(uri),
 		cid,
 		title: value.title,
-		pages: value.pages,
 		description: value.description,
 		author: value.author,
 		publication: value.publication,
@@ -125,7 +126,7 @@ export function leafletBlocksToHTML(record: {
 	id: string;
 	uri: string;
 	cid: string;
-	value: PubLeafletDocument.Main;
+	value: LeafletDocumentRecord;
 }) {
 	let html = "";
 	const firstPage = record.value.pages[0];

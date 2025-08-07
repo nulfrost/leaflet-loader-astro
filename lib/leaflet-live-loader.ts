@@ -6,11 +6,12 @@ import type {
 	EntryFilter,
 	LeafletDocumentRecord,
 	LeafletDocumentView,
-	LeafletLoaderOptions,
+	LiveLeafletLoaderOptions,
 } from "./types.js";
 import {
 	getLeafletDocuments,
 	getSingleLeafletDocument,
+	leafletBlocksToHTML,
 	leafletDocumentRecordToView,
 	LiveLoaderError,
 	resolveMiniDoc,
@@ -18,7 +19,7 @@ import {
 } from "./utils.js";
 
 export function leafletLiveLoader(
-	options: LeafletLoaderOptions,
+	options: LiveLeafletLoaderOptions,
 ): LiveLoader<
 	LeafletDocumentView,
 	EntryFilter,
@@ -46,7 +47,7 @@ export function leafletLiveLoader(
 				const pds_url = await resolveMiniDoc(repo);
 				const agent = new Agent({ service: pds_url });
 
-				const documents = await getLeafletDocuments({
+				const { documents } = await getLeafletDocuments({
 					agent,
 					repo,
 					reverse: filter?.reverse,
@@ -64,6 +65,14 @@ export function leafletLiveLoader(
 								cid: document.cid,
 								value: document.value as unknown as LeafletDocumentRecord,
 							}),
+							rendered: {
+								html: leafletBlocksToHTML({
+									id,
+									uri: document.uri,
+									cid: document.cid,
+									value: document.value as unknown as LeafletDocumentRecord,
+								}),
+							},
 						};
 					}),
 				};
@@ -94,13 +103,23 @@ export function leafletLiveLoader(
 					repo,
 				});
 
+				const cid = document?.cid?.toString() ?? "";
+
 				return {
 					id: filter.id,
 					data: leafletDocumentRecordToView({
 						uri: document.uri,
-						cid: document.cid?.toString() ?? "",
+						cid,
 						value: document.value as unknown as LeafletDocumentRecord,
 					}),
+					rendered: {
+						html: leafletBlocksToHTML({
+							id: filter.id,
+							uri: document.uri,
+							cid,
+							value: document.value as unknown as LeafletDocumentRecord,
+						}),
+					},
 				};
 			} catch {
 				return {
