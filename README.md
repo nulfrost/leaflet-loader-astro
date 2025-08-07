@@ -20,7 +20,7 @@ npm install @nulfrost/leaflet-loader-astro
 ```ts
 // src/content.config.ts
 import { defineCollection, z } from "astro:content";
-import { leafletStaticLoader } from "leaflet-loader-astro";
+import { leafletStaticLoader } from "@nulfrost/leaflet-loader-astro";
 
 const documents = defineCollection({
 	loader: leafletStaticLoader({ repo: "did:plc:qttsv4e7pu2jl3ilanfgc3zn" }),
@@ -101,7 +101,7 @@ export default defineConfig({
 ```ts
 // src/live.config.ts
 import { defineLiveCollection, z } from "astro:content";
-import { leafletLiveLoader } from "leaflet-loader-astro";
+import { leafletLiveLoader } from "@nulfrost/leaflet-loader-astro";
 
 const documents = defineLiveCollection({
 	loader: leafletLiveLoader({ repo: "did:plc:qttsv4e7pu2jl3ilanfgc3zn" }),
