@@ -158,3 +158,9 @@ const { Content } = await render(document?.entry);
 
 <Content />
 ```
+
+## License
+
+MIT
+
+For questions, contributions, and support, please open an issue on GitHub.
