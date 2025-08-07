@@ -1,6 +1,6 @@
 {
 	"name": "leaflet-loader-astro",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"description": "A leaflet.pub astro collection loader",
 	"keywords": [
 		"astro",
