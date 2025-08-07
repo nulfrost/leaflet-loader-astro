@@ -1,4 +1,4 @@
-name: Linting / Testing / Formatting
+name: CI
 
 on:
     push:
