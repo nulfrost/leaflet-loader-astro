@@ -10,7 +10,7 @@ There are two different types of loaders you can use from this package:
 ## Installation
 
 ```bash
-npm install leaflet-loader-astro
+npm install @nulfrost/leaflet-loader-astro
 ```
 
 ## Usage
