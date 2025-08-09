@@ -245,7 +245,7 @@ function parseBlocks(block: PubLeafletPagesLinearDocument.Block) {
 				children.push(`${segment.text}`);
 			}
 		}
-		html += `<p>${children}</p>`;
+		html += `<p>${children.join("")}</p>`;
 	}
 
 	if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
@@ -273,16 +273,16 @@ function parseBlocks(block: PubLeafletPagesLinearDocument.Block) {
 		html += `<hr />`;
 	}
 	if (is(PubLeafletBlocksUnorderedList.mainSchema, block.block)) {
-		html += `<ul>$${block.block.children.map((child) => renderListItem(child))}</ul>`;
+		html += `<ul>${block.block.children.map((child) => renderListItem(child)).join("")}</ul>`;
 	}
 
-	return html;
+	return html.trim();
 }
 
 function renderListItem(item: PubLeafletBlocksUnorderedList.ListItem): string {
 	const children: string | null = item.children?.length
 		? `<ul>${item.children.map((child) => renderListItem(child))}</ul>`
-		: null;
+		: "";
 
 	return `<li>${parseBlocks({ block: item.content })}${children}</li>`;
 }

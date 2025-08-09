@@ -25,7 +25,7 @@
 		"typecheck": "tsc",
 		"release": "pnpm run build && changeset publish",
 		"build": "rm -rf dist && tsup --format esm --dts",
-		"pack": "pnpm build && pnpm pack"
+		"pack": "rm -rf *.tgz && pnpm build && pnpm pack"
 	},
 	"license": "MIT",
 	"files": [
