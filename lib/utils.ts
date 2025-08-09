@@ -3,6 +3,7 @@ import { AtUri, UnicodeString } from "@atproto/api";
 import sanitizeHTML from "sanitize-html";
 import {
 	PubLeafletBlocksHeader,
+	PubLeafletBlocksHorizontalRule,
 	PubLeafletBlocksText,
 	PubLeafletPagesLinearDocument,
 } from "./lexicons/index.js";
@@ -204,6 +205,10 @@ export function leafletBlocksToHTML(record: {
 			if (!block.block.level) {
 				html += `<h6>${block.block.plaintext}</h6>`;
 			}
+		}
+
+		if (is(PubLeafletBlocksHorizontalRule.mainSchema, block.block)) {
+			html += `<hr />`;
 		}
 	}
 
