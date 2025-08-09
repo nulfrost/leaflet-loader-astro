@@ -1,9 +1,12 @@
 import { is } from "@atcute/lexicons";
 import { AtUri, UnicodeString } from "@atproto/api";
 import sanitizeHTML from "sanitize-html";
+import katex from "katex";
 import {
+	PubLeafletBlocksCode,
 	PubLeafletBlocksHeader,
 	PubLeafletBlocksHorizontalRule,
+	PubLeafletBlocksMath,
 	PubLeafletBlocksText,
 	PubLeafletBlocksUnorderedList,
 	PubLeafletPagesLinearDocument,
@@ -136,7 +139,13 @@ export function leafletBlocksToHTML(record: LeafletDocumentRecord) {
 		html += parseBlocks(block);
 	}
 
-	return sanitizeHTML(html);
+	return sanitizeHTML(html, {
+		// this is specifically for the math block, though someone could overwrite this if they wanted to
+		// can leave this as the default
+		allowedAttributes: {
+			"*": ["class", "style"],
+		},
+	});
 }
 
 export class RichText {
@@ -226,7 +235,7 @@ function parseBlocks(block: PubLeafletPagesLinearDocument.Block) {
 				(segment) => segment.$type === "pub.leaflet.richtext.facet#italic",
 			);
 			if (isCode) {
-				children.push(`<code>${segment.text}</code>`);
+				children.push(`<pre><code>${segment.text}</code></pre>`);
 			} else if (link) {
 				children.push(
 					`<a href="${link.uri}" target="_blank" rel="noopener noreferrer">${segment.text}</a>`,
@@ -274,6 +283,14 @@ function parseBlocks(block: PubLeafletPagesLinearDocument.Block) {
 	}
 	if (is(PubLeafletBlocksUnorderedList.mainSchema, block.block)) {
 		html += `<ul>${block.block.children.map((child) => renderListItem(child)).join("")}</ul>`;
+	}
+
+	if (is(PubLeafletBlocksMath.mainSchema, block.block)) {
+		html += `<div>${katex.renderToString(block.block.tex, { displayMode: true, output: "html", throwOnError: false })}</div>`;
+	}
+
+	if (is(PubLeafletBlocksCode.mainSchema, block.block)) {
+		html += `<pre><code data-language=${block.block.language}>${block.block.plaintext}</code></pre>`;
 	}
 
 	return html.trim();

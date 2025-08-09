@@ -58,6 +58,7 @@
 		"@atcute/lexicons": "^1.1.0",
 		"@atproto/api": "^0.16.1",
 		"@atproto/did": "^0.1.5",
+		"katex": "^0.16.22",
 		"sanitize-html": "^2.17.0"
 	}
 }
