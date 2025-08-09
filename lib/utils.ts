@@ -163,17 +163,10 @@ export function leafletBlocksToHTML(record: {
 					(segment) => segment.$type === "pub.leaflet.richtext.facet#italic",
 				);
 				if (isCode) {
-					children.push(` <code>
-          ${segment.text}
-        </code>`);
+					children.push(`<code>${segment.text}</code>`);
 				} else if (link) {
 					children.push(
-						` <a
-          href="${link.uri}"
-          target="_blank"
-        >
-          ${segment.text}
-        </a>`,
+						`<a href="${link.uri}" target="_blank">${segment.text}</a>`,
 					);
 				} else if (isBold) {
 					children.push(`<b>${segment.text}</b>`);
@@ -186,14 +179,10 @@ export function leafletBlocksToHTML(record: {
 				} else if (isItalic) {
 					children.push(`<i>${segment.text}</i>`);
 				} else {
-					children.push(
-						`
-          ${segment.text}
-       `,
-					);
+					children.push(`${segment.text}`);
 				}
 			}
-			html += `<p>${children.join("\n")}</p>`;
+			html += `<p>${children}</p>`;
 		}
 
 		if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
