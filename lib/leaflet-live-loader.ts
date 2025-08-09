@@ -66,12 +66,9 @@ export function leafletLiveLoader(
 								value: document.value as unknown as LeafletDocumentRecord,
 							}),
 							rendered: {
-								html: leafletBlocksToHTML({
-									id,
-									uri: document.uri,
-									cid: document.cid,
-									value: document.value as unknown as LeafletDocumentRecord,
-								}),
+								html: leafletBlocksToHTML(
+									document.value as unknown as LeafletDocumentRecord,
+								),
 							},
 						};
 					}),
@@ -113,12 +110,9 @@ export function leafletLiveLoader(
 						value: document.value as unknown as LeafletDocumentRecord,
 					}),
 					rendered: {
-						html: leafletBlocksToHTML({
-							id: filter.id,
-							uri: document.uri,
-							cid,
-							value: document.value as unknown as LeafletDocumentRecord,
-						}),
+						html: leafletBlocksToHTML(
+							document.value as unknown as LeafletDocumentRecord,
+						),
 					},
 				};
 			} catch {

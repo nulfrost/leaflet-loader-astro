@@ -82,12 +82,9 @@ export function leafletStaticLoader(
 							}),
 							digest,
 							rendered: {
-								html: leafletBlocksToHTML({
-									id,
-									uri: document.uri,
-									cid: document.cid,
-									value: document.value as unknown as LeafletDocumentRecord,
-								}),
+								html: leafletBlocksToHTML(
+									document.value as unknown as LeafletDocumentRecord,
+								),
 							},
 						});
 					}

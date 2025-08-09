@@ -5,6 +5,7 @@ import {
 	PubLeafletBlocksHeader,
 	PubLeafletBlocksHorizontalRule,
 	PubLeafletBlocksText,
+	PubLeafletBlocksUnorderedList,
 	PubLeafletPagesLinearDocument,
 } from "./lexicons/index.js";
 import type {
@@ -123,93 +124,16 @@ export function leafletDocumentRecordToView({
 	};
 }
 
-export function leafletBlocksToHTML(record: {
-	id: string;
-	uri: string;
-	cid: string;
-	value: LeafletDocumentRecord;
-}) {
+export function leafletBlocksToHTML(record: LeafletDocumentRecord) {
+	const firstPage = record.pages[0];
 	let html = "";
-	const firstPage = record.value.pages[0];
 	let blocks: PubLeafletPagesLinearDocument.Block[] = [];
 	if (is(PubLeafletPagesLinearDocument.mainSchema, firstPage)) {
 		blocks = firstPage.blocks || [];
 	}
 
 	for (const block of blocks) {
-		if (is(PubLeafletBlocksText.mainSchema, block.block)) {
-			const rt = new RichText({
-				text: block.block.plaintext,
-				facets: block.block.facets || [],
-			});
-			const children = [];
-			for (const segment of rt.segments()) {
-				const link = segment.facet?.find(
-					(segment) => segment.$type === "pub.leaflet.richtext.facet#link",
-				);
-				const isBold = segment.facet?.find(
-					(segment) => segment.$type === "pub.leaflet.richtext.facet#bold",
-				);
-				const isCode = segment.facet?.find(
-					(segment) => segment.$type === "pub.leaflet.richtext.facet#code",
-				);
-				const isStrikethrough = segment.facet?.find(
-					(segment) =>
-						segment.$type === "pub.leaflet.richtext.facet#strikethrough",
-				);
-				const isUnderline = segment.facet?.find(
-					(segment) => segment.$type === "pub.leaflet.richtext.facet#underline",
-				);
-				const isItalic = segment.facet?.find(
-					(segment) => segment.$type === "pub.leaflet.richtext.facet#italic",
-				);
-				if (isCode) {
-					children.push(`<code>${segment.text}</code>`);
-				} else if (link) {
-					children.push(
-						`<a href="${link.uri}" target="_blank">${segment.text}</a>`,
-					);
-				} else if (isBold) {
-					children.push(`<b>${segment.text}</b>`);
-				} else if (isStrikethrough) {
-					children.push(`<s>${segment.text}</s>`);
-				} else if (isUnderline) {
-					children.push(
-						`<span style="text-decoration:underline;">${segment.text}</span>`,
-					);
-				} else if (isItalic) {
-					children.push(`<i>${segment.text}</i>`);
-				} else {
-					children.push(`${segment.text}`);
-				}
-			}
-			html += `<p>${children}</p>`;
-		}
-
-		if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
-			if (block.block.level === 1) {
-				html += `<h2>${block.block.plaintext}</h2>`;
-			}
-		}
-		if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
-			if (block.block.level === 2) {
-				html += `<h3>${block.block.plaintext}</h3>`;
-			}
-		}
-		if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
-			if (block.block.level === 3) {
-				html += `<h4>${block.block.plaintext}</h4>`;
-			}
-		}
-		if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
-			if (!block.block.level) {
-				html += `<h6>${block.block.plaintext}</h6>`;
-			}
-		}
-
-		if (is(PubLeafletBlocksHorizontalRule.mainSchema, block.block)) {
-			html += `<hr />`;
-		}
+		html += parseBlocks(block);
 	}
 
 	return sanitizeHTML(html);
@@ -271,4 +195,94 @@ export class RichText {
 			};
 		}
 	}
+}
+
+function parseBlocks(block: PubLeafletPagesLinearDocument.Block) {
+	let html = "";
+	if (is(PubLeafletBlocksText.mainSchema, block.block)) {
+		const rt = new RichText({
+			text: block.block.plaintext,
+			facets: block.block.facets || [],
+		});
+		const children = [];
+		for (const segment of rt.segments()) {
+			const link = segment.facet?.find(
+				(segment) => segment.$type === "pub.leaflet.richtext.facet#link",
+			);
+			const isBold = segment.facet?.find(
+				(segment) => segment.$type === "pub.leaflet.richtext.facet#bold",
+			);
+			const isCode = segment.facet?.find(
+				(segment) => segment.$type === "pub.leaflet.richtext.facet#code",
+			);
+			const isStrikethrough = segment.facet?.find(
+				(segment) =>
+					segment.$type === "pub.leaflet.richtext.facet#strikethrough",
+			);
+			const isUnderline = segment.facet?.find(
+				(segment) => segment.$type === "pub.leaflet.richtext.facet#underline",
+			);
+			const isItalic = segment.facet?.find(
+				(segment) => segment.$type === "pub.leaflet.richtext.facet#italic",
+			);
+			if (isCode) {
+				children.push(`<code>${segment.text}</code>`);
+			} else if (link) {
+				children.push(
+					`<a href="${link.uri}" target="_blank" rel="noopener noreferrer">${segment.text}</a>`,
+				);
+			} else if (isBold) {
+				children.push(`<b>${segment.text}</b>`);
+			} else if (isStrikethrough) {
+				children.push(`<s>${segment.text}</s>`);
+			} else if (isUnderline) {
+				children.push(
+					`<span style="text-decoration:underline;">${segment.text}</span>`,
+				);
+			} else if (isItalic) {
+				children.push(`<i>${segment.text}</i>`);
+			} else {
+				children.push(`${segment.text}`);
+			}
+		}
+		html += `<p>${children}</p>`;
+	}
+
+	if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
+		if (block.block.level === 1) {
+			html += `<h2>${block.block.plaintext}</h2>`;
+		}
+	}
+	if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
+		if (block.block.level === 2) {
+			html += `<h3>${block.block.plaintext}</h3>`;
+		}
+	}
+	if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
+		if (block.block.level === 3) {
+			html += `<h4>${block.block.plaintext}</h4>`;
+		}
+	}
+	if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
+		if (!block.block.level) {
+			html += `<h6>${block.block.plaintext}</h6>`;
+		}
+	}
+
+	if (is(PubLeafletBlocksHorizontalRule.mainSchema, block.block)) {
+		html += `<hr />`;
+	}
+	if (is(PubLeafletBlocksUnorderedList.mainSchema, block.block)) {
+		html += `<ul>$${block.block.children.map((child) => renderListItem(child))}</ul>`;
+	}
+
+	return html;
+}
+
+function renderListItem(item: PubLeafletBlocksUnorderedList.ListItem): string {
+	const children: string | null = item.children?.length
+		? `<ul>${item.children.map((child) => renderListItem(child))}</ul>`
+		: null;
+
+	return `<li>${parseBlocks({ block: item.content })}${children}</li>`;
 }
