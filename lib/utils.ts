@@ -36,6 +36,7 @@ export class LiveLoaderError extends Error {
 export function uriToRkey(uri: string): string {
 	const u = AtUri.make(uri);
 	if (!u.rkey) {
+		throw new Error("failed to get rkey");
 	}
 	return u.rkey;
 }
