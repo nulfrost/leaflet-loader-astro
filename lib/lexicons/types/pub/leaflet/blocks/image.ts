@@ -14,7 +14,7 @@ const _mainSchema = /*#__PURE__*/ v.object({
   ),
   alt: /*#__PURE__*/ v.optional(/*#__PURE__*/ v.string()),
   get aspectRatio() {
-    return aspectRatioSchema;
+    return _aspectRatioSchema;
   },
   image: /*#__PURE__*/ v.blob(),
 });

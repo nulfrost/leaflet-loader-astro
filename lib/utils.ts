@@ -1,11 +1,13 @@
 import { is } from "@atcute/lexicons";
 import { AtUri, UnicodeString } from "@atproto/api";
 import sanitizeHTML from "sanitize-html";
+import type {} from "@atcute/atproto";
 import katex from "katex";
 import {
 	PubLeafletBlocksCode,
 	PubLeafletBlocksHeader,
 	PubLeafletBlocksHorizontalRule,
+	PubLeafletBlocksImage,
 	PubLeafletBlocksMath,
 	PubLeafletBlocksText,
 	PubLeafletBlocksUnorderedList,
@@ -34,7 +36,6 @@ export class LiveLoaderError extends Error {
 export function uriToRkey(uri: string): string {
 	const u = AtUri.make(uri);
 	if (!u.rkey) {
-		throw new Error("Failed to get rkey from uri.");
 	}
 	return u.rkey;
 }
@@ -52,7 +53,10 @@ export async function resolveMiniDoc(handleOrDid: string) {
 		}
 		const data = (await response.json()) as MiniDoc;
 
-		return data.pds;
+		return {
+			pds: data.pds,
+			did: data.did,
+		};
 	} catch {
 		throw new Error(`failed to resolve handle: ${handleOrDid}`);
 	}
@@ -62,18 +66,20 @@ export async function getLeafletDocuments({
 	repo,
 	reverse,
 	cursor,
-	agent,
+	rpc,
 	limit,
 }: GetLeafletDocumentsParams) {
-	const response = await agent.com.atproto.repo.listRecords({
-		repo,
-		collection: "pub.leaflet.document",
-		cursor,
-		reverse,
-		limit,
+	const { ok, data } = await rpc.get("com.atproto.repo.listRecords", {
+		params: {
+			collection: "pub.leaflet.document",
+			cursor,
+			reverse,
+			limit,
+			repo,
+		},
 	});
 
-	if (response.success === false) {
+	if (!ok) {
 		throw new LiveLoaderError(
 			"error fetching leaflet documents",
 			"DOCUMENT_FETCH_ERROR",
@@ -81,30 +87,32 @@ export async function getLeafletDocuments({
 	}
 
 	return {
-		documents: response?.data?.records,
-		cursor: response?.data?.cursor,
+		documents: data?.records,
+		cursor: data?.cursor,
 	};
 }
 
 export async function getSingleLeafletDocument({
-	agent,
+	rpc,
 	repo,
 	id,
 }: GetSingleLeafletDocumentParams) {
-	const response = await agent.com.atproto.repo.getRecord({
-		repo,
-		collection: "pub.leaflet.document",
-		rkey: id,
+	const { ok, data } = await rpc.get("com.atproto.repo.getRecord", {
+		params: {
+			collection: "pub.leaflet.document",
+			repo,
+			rkey: id,
+		},
 	});
 
-	if (response.success === false) {
+	if (!ok) {
 		throw new LiveLoaderError(
 			"error fetching single document",
 			"DOCUMENT_FETCH_ERROR",
 		);
 	}
 
-	return response?.data;
+	return data;
 }
 
 export function leafletDocumentRecordToView({
@@ -127,23 +135,29 @@ export function leafletDocumentRecordToView({
 	};
 }
 
-export function leafletBlocksToHTML(record: LeafletDocumentRecord) {
-	const firstPage = record.pages[0];
+export function leafletBlocksToHTML({
+	record,
+	did,
+}: {
+	record: LeafletDocumentRecord;
+	did: string;
+}) {
 	let html = "";
+	const firstPage = record.pages[0];
 	let blocks: PubLeafletPagesLinearDocument.Block[] = [];
+
 	if (is(PubLeafletPagesLinearDocument.mainSchema, firstPage)) {
 		blocks = firstPage.blocks || [];
 	}
 
 	for (const block of blocks) {
-		html += parseBlocks(block);
+		html += parseBlocks({ block, did });
 	}
 
 	return sanitizeHTML(html, {
-		// this is specifically for the math block, though someone could overwrite this if they wanted to
-		// can leave this as the default
 		allowedAttributes: {
 			"*": ["class", "style"],
+			img: ["src", "height", "width", "alt"],
 		},
 	});
 }
@@ -151,7 +165,6 @@ export function leafletBlocksToHTML(record: LeafletDocumentRecord) {
 export class RichText {
 	unicodeText: UnicodeString;
 	facets?: Facet[];
-
 	constructor(props: { text: string; facets: Facet[] }) {
 		this.unicodeText = new UnicodeString(props.text);
 		this.facets = props.facets;
@@ -206,8 +219,15 @@ export class RichText {
 	}
 }
 
-function parseBlocks(block: PubLeafletPagesLinearDocument.Block) {
+function parseBlocks({
+	block,
+	did,
+}: {
+	block: PubLeafletPagesLinearDocument.Block;
+	did: string;
+}): string {
 	let html = "";
+
 	if (is(PubLeafletBlocksText.mainSchema, block.block)) {
 		const rt = new RichText({
 			text: block.block.plaintext,
@@ -282,7 +302,7 @@ function parseBlocks(block: PubLeafletPagesLinearDocument.Block) {
 		html += `<hr />`;
 	}
 	if (is(PubLeafletBlocksUnorderedList.mainSchema, block.block)) {
-		html += `<ul>${block.block.children.map((child) => renderListItem(child)).join("")}</ul>`;
+		html += `<ul>${block.block.children.map((child) => renderListItem({ item: child, did })).join("")}</ul>`;
 	}
 
 	if (is(PubLeafletBlocksMath.mainSchema, block.block)) {
@@ -293,13 +313,24 @@ function parseBlocks(block: PubLeafletPagesLinearDocument.Block) {
 		html += `<pre><code data-language=${block.block.language}>${block.block.plaintext}</code></pre>`;
 	}
 
+	if (is(PubLeafletBlocksImage.mainSchema, block.block)) {
+		// @ts-ignore
+		html += `<div><img src="https://cdn.bsky.app/img/feed_fullsize/plain/${did}/${block.block.image.ref.$link}@jpeg" height="${block.block.aspectRatio.height}" width="${block.block.aspectRatio.width}" alt="${block.block.alt}" /></div>`;
+	}
+
 	return html.trim();
 }
 
-function renderListItem(item: PubLeafletBlocksUnorderedList.ListItem): string {
+function renderListItem({
+	item,
+	did,
+}: {
+	item: PubLeafletBlocksUnorderedList.ListItem;
+	did: string;
+}): string {
 	const children: string | null = item.children?.length
-		? `<ul>${item.children.map((child) => renderListItem(child))}</ul>`
+		? `<ul>${item.children.map((child) => renderListItem({ item: child, did }))}</ul>`
 		: "";
 
-	return `<li>${parseBlocks({ block: item.content })}${children}</li>`;
+	return `<li>${parseBlocks({ block: { block: item.content }, did })}${children}</li>`;
 }

@@ -1,4 +1,4 @@
-import { Agent } from "@atproto/api";
+import { AtpAgent } from "@atproto/api";
 import { isDid } from "@atproto/did";
 import type { LiveLoader } from "astro/loaders";
 import type {
@@ -17,6 +17,7 @@ import {
 	resolveMiniDoc,
 	uriToRkey,
 } from "./utils.js";
+import { Client, simpleFetchHandler } from "@atcute/client";
 
 export function leafletLiveLoader(
 	options: LiveLeafletLoaderOptions,
@@ -44,11 +45,12 @@ export function leafletLiveLoader(
 		name: "leaflet-loader-astro",
 		loadCollection: async ({ filter }) => {
 			try {
-				const pds_url = await resolveMiniDoc(repo);
-				const agent = new Agent({ service: pds_url });
+				const { pds, did } = await resolveMiniDoc(repo);
+				const handler = simpleFetchHandler({ service: pds });
+				const rpc = new Client({ handler });
 
 				const { documents } = await getLeafletDocuments({
-					agent,
+					rpc,
 					repo,
 					reverse: filter?.reverse,
 					cursor: filter?.cursor,
@@ -66,9 +68,10 @@ export function leafletLiveLoader(
 								value: document.value as unknown as LeafletDocumentRecord,
 							}),
 							rendered: {
-								html: leafletBlocksToHTML(
-									document.value as unknown as LeafletDocumentRecord,
-								),
+								html: leafletBlocksToHTML({
+									record: document.value as unknown as LeafletDocumentRecord,
+									did,
+								}),
 							},
 						};
 					}),
@@ -92,10 +95,11 @@ export function leafletLiveLoader(
 				};
 			}
 			try {
-				const pds_url = await resolveMiniDoc(repo);
-				const agent = new Agent({ service: pds_url });
+				const { pds, did } = await resolveMiniDoc(repo);
+				const handler = simpleFetchHandler({ service: pds });
+				const rpc = new Client({ handler });
 				const document = await getSingleLeafletDocument({
-					agent,
+					rpc,
 					id: filter.id,
 					repo,
 				});
@@ -110,9 +114,10 @@ export function leafletLiveLoader(
 						value: document.value as unknown as LeafletDocumentRecord,
 					}),
 					rendered: {
-						html: leafletBlocksToHTML(
-							document.value as unknown as LeafletDocumentRecord,
-						),
+						html: leafletBlocksToHTML({
+							record: document.value as unknown as LeafletDocumentRecord,
+							did,
+						}),
 					},
 				};
 			} catch {
