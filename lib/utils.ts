@@ -1,9 +1,16 @@
+import type {} from "@atcute/atproto";
 import { is } from "@atcute/lexicons";
 import { AtUri, UnicodeString } from "@atproto/api";
+import katex from "katex";
 import sanitizeHTML from "sanitize-html";
 import {
+	PubLeafletBlocksCode,
 	PubLeafletBlocksHeader,
+	PubLeafletBlocksHorizontalRule,
+	PubLeafletBlocksImage,
+	PubLeafletBlocksMath,
 	PubLeafletBlocksText,
+	PubLeafletBlocksUnorderedList,
 	PubLeafletPagesLinearDocument,
 } from "./lexicons/index.js";
 import type {
@@ -29,7 +36,7 @@ export class LiveLoaderError extends Error {
 export function uriToRkey(uri: string): string {
 	const u = AtUri.make(uri);
 	if (!u.rkey) {
-		throw new Error("Failed to get rkey from uri.");
+		throw new Error("failed to get rkey");
 	}
 	return u.rkey;
 }
@@ -47,7 +54,10 @@ export async function resolveMiniDoc(handleOrDid: string) {
 		}
 		const data = (await response.json()) as MiniDoc;
 
-		return data.pds;
+		return {
+			pds: data.pds,
+			did: data.did,
+		};
 	} catch {
 		throw new Error(`failed to resolve handle: ${handleOrDid}`);
 	}
@@ -57,18 +67,20 @@ export async function getLeafletDocuments({
 	repo,
 	reverse,
 	cursor,
-	agent,
+	rpc,
 	limit,
 }: GetLeafletDocumentsParams) {
-	const response = await agent.com.atproto.repo.listRecords({
-		repo,
-		collection: "pub.leaflet.document",
-		cursor,
-		reverse,
-		limit,
+	const { ok, data } = await rpc.get("com.atproto.repo.listRecords", {
+		params: {
+			collection: "pub.leaflet.document",
+			cursor,
+			reverse,
+			limit,
+			repo,
+		},
 	});
 
-	if (response.success === false) {
+	if (!ok) {
 		throw new LiveLoaderError(
 			"error fetching leaflet documents",
 			"DOCUMENT_FETCH_ERROR",
@@ -76,30 +88,32 @@ export async function getLeafletDocuments({
 	}
 
 	return {
-		documents: response?.data?.records,
-		cursor: response?.data?.cursor,
+		documents: data?.records,
+		cursor: data?.cursor,
 	};
 }
 
 export async function getSingleLeafletDocument({
-	agent,
+	rpc,
 	repo,
 	id,
 }: GetSingleLeafletDocumentParams) {
-	const response = await agent.com.atproto.repo.getRecord({
-		repo,
-		collection: "pub.leaflet.document",
-		rkey: id,
+	const { ok, data } = await rpc.get("com.atproto.repo.getRecord", {
+		params: {
+			collection: "pub.leaflet.document",
+			repo,
+			rkey: id,
+		},
 	});
 
-	if (response.success === false) {
+	if (!ok) {
 		throw new LiveLoaderError(
 			"error fetching single document",
 			"DOCUMENT_FETCH_ERROR",
 		);
 	}
 
-	return response?.data;
+	return data;
 }
 
 export function leafletDocumentRecordToView({
@@ -122,109 +136,59 @@ export function leafletDocumentRecordToView({
 	};
 }
 
-export function leafletBlocksToHTML(record: {
-	id: string;
-	uri: string;
-	cid: string;
-	value: LeafletDocumentRecord;
+export function leafletBlocksToHTML({
+	record,
+	did,
+}: {
+	record: LeafletDocumentRecord;
+	did: string;
 }) {
 	let html = "";
-	const firstPage = record.value.pages[0];
+	const firstPage = record.pages[0];
 	let blocks: PubLeafletPagesLinearDocument.Block[] = [];
+
 	if (is(PubLeafletPagesLinearDocument.mainSchema, firstPage)) {
 		blocks = firstPage.blocks || [];
 	}
 
 	for (const block of blocks) {
-		if (is(PubLeafletBlocksText.mainSchema, block.block)) {
-			const rt = new RichText({
-				text: block.block.plaintext,
-				facets: block.block.facets || [],
-			});
-			const children = [];
-			for (const segment of rt.segments()) {
-				const link = segment.facet?.find(
-					(segment) => segment.$type === "pub.leaflet.richtext.facet#link",
-				);
-				const isBold = segment.facet?.find(
-					(segment) => segment.$type === "pub.leaflet.richtext.facet#bold",
-				);
-				const isCode = segment.facet?.find(
-					(segment) => segment.$type === "pub.leaflet.richtext.facet#code",
-				);
-				const isStrikethrough = segment.facet?.find(
-					(segment) =>
-						segment.$type === "pub.leaflet.richtext.facet#strikethrough",
-				);
-				const isUnderline = segment.facet?.find(
-					(segment) => segment.$type === "pub.leaflet.richtext.facet#underline",
-				);
-				const isItalic = segment.facet?.find(
-					(segment) => segment.$type === "pub.leaflet.richtext.facet#italic",
-				);
-				if (isCode) {
-					children.push(` <code>
-          ${segment.text}
-        </code>`);
-				} else if (link) {
-					children.push(
-						` <a
-          href="${link.uri}"
-          target="_blank"
-        >
-          ${segment.text}
-        </a>`,
-					);
-				} else if (isBold) {
-					children.push(`<b>${segment.text}</b>`);
-				} else if (isStrikethrough) {
-					children.push(`<s>${segment.text}</s>`);
-				} else if (isUnderline) {
-					children.push(
-						`<span style="text-decoration:underline;">${segment.text}</span>`,
-					);
-				} else if (isItalic) {
-					children.push(`<i>${segment.text}</i>`);
-				} else {
-					children.push(
-						`
-          ${segment.text}
-       `,
-					);
-				}
-			}
-			html += `<p>${children.join("\n")}</p>`;
-		}
-
-		if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
-			if (block.block.level === 1) {
-				html += `<h2>${block.block.plaintext}</h2>`;
-			}
-		}
-		if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
-			if (block.block.level === 2) {
-				html += `<h3>${block.block.plaintext}</h3>`;
-			}
-		}
-		if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
-			if (block.block.level === 3) {
-				html += `<h4>${block.block.plaintext}</h4>`;
-			}
-		}
-		if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
-			if (!block.block.level) {
-				html += `<h6>${block.block.plaintext}</h6>`;
-			}
-		}
+		html += parseBlocks({ block, did });
 	}
 
-	return sanitizeHTML(html);
+	return sanitizeHTML(html, {
+		allowedAttributes: {
+			"*": ["class", "style"],
+			img: ["src", "height", "width", "alt"],
+			a: ["href", "target", "rel"],
+		},
+		allowedTags: [
+			"img",
+			"pre",
+			"code",
+			"p",
+			"a",
+			"b",
+			"s",
+			"ul",
+			"li",
+			"i",
+			"h1",
+			"h2",
+			"h3",
+			"h4",
+			"h5",
+			"h6",
+			"hr",
+			"div",
+			"span",
+		],
+		selfClosing: ["img"],
+	});
 }
 
 export class RichText {
 	unicodeText: UnicodeString;
 	facets?: Facet[];
-
 	constructor(props: { text: string; facets: Facet[] }) {
 		this.unicodeText = new UnicodeString(props.text);
 		this.facets = props.facets;
@@ -277,4 +241,120 @@ export class RichText {
 			};
 		}
 	}
+}
+
+function parseBlocks({
+	block,
+	did,
+}: {
+	block: PubLeafletPagesLinearDocument.Block;
+	did: string;
+}): string {
+	let html = "";
+
+	if (is(PubLeafletBlocksText.mainSchema, block.block)) {
+		const rt = new RichText({
+			text: block.block.plaintext,
+			facets: block.block.facets || [],
+		});
+		const children = [];
+		for (const segment of rt.segments()) {
+			const link = segment.facet?.find(
+				(segment) => segment.$type === "pub.leaflet.richtext.facet#link",
+			);
+			const isBold = segment.facet?.find(
+				(segment) => segment.$type === "pub.leaflet.richtext.facet#bold",
+			);
+			const isCode = segment.facet?.find(
+				(segment) => segment.$type === "pub.leaflet.richtext.facet#code",
+			);
+			const isStrikethrough = segment.facet?.find(
+				(segment) =>
+					segment.$type === "pub.leaflet.richtext.facet#strikethrough",
+			);
+			const isUnderline = segment.facet?.find(
+				(segment) => segment.$type === "pub.leaflet.richtext.facet#underline",
+			);
+			const isItalic = segment.facet?.find(
+				(segment) => segment.$type === "pub.leaflet.richtext.facet#italic",
+			);
+			if (isCode) {
+				children.push(`<pre><code>${segment.text}</code></pre>`);
+			} else if (link) {
+				children.push(
+					`<a href="${link.uri}" target="_blank" rel="noopener noreferrer">${segment.text}</a>`,
+				);
+			} else if (isBold) {
+				children.push(`<b>${segment.text}</b>`);
+			} else if (isStrikethrough) {
+				children.push(`<s>${segment.text}</s>`);
+			} else if (isUnderline) {
+				children.push(
+					`<span style="text-decoration:underline;">${segment.text}</span>`,
+				);
+			} else if (isItalic) {
+				children.push(`<i>${segment.text}</i>`);
+			} else {
+				children.push(`${segment.text}`);
+			}
+		}
+		html += `<p>${children.join("")}</p>`;
+	}
+
+	if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
+		if (block.block.level === 1) {
+			html += `<h2>${block.block.plaintext}</h2>`;
+		}
+	}
+	if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
+		if (block.block.level === 2) {
+			html += `<h3>${block.block.plaintext}</h3>`;
+		}
+	}
+	if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
+		if (block.block.level === 3) {
+			html += `<h4>${block.block.plaintext}</h4>`;
+		}
+	}
+	if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
+		if (!block.block.level) {
+			html += `<h6>${block.block.plaintext}</h6>`;
+		}
+	}
+
+	if (is(PubLeafletBlocksHorizontalRule.mainSchema, block.block)) {
+		html += `<hr />`;
+	}
+	if (is(PubLeafletBlocksUnorderedList.mainSchema, block.block)) {
+		html += `<ul>${block.block.children.map((child) => renderListItem({ item: child, did })).join("")}</ul>`;
+	}
+
+	if (is(PubLeafletBlocksMath.mainSchema, block.block)) {
+		html += `<div>${katex.renderToString(block.block.tex, { displayMode: true, output: "html", throwOnError: false })}</div>`;
+	}
+
+	if (is(PubLeafletBlocksCode.mainSchema, block.block)) {
+		html += `<pre><code data-language=${block.block.language}>${block.block.plaintext}</code></pre>`;
+	}
+
+	if (is(PubLeafletBlocksImage.mainSchema, block.block)) {
+		// @ts-ignore
+		html += `<div><img src="https://cdn.bsky.app/img/feed_fullsize/plain/${did}/${block.block.image.ref.$link}@jpeg" height="${block.block.aspectRatio.height}" width="${block.block.aspectRatio.width}" alt="${block.block.alt}" /></div>`;
+	}
+
+	return html.trim();
+}
+
+function renderListItem({
+	item,
+	did,
+}: {
+	item: PubLeafletBlocksUnorderedList.ListItem;
+	did: string;
+}): string {
+	const children: string | null = item.children?.length
+		? `<ul>${item.children.map((child) => renderListItem({ item: child, did }))}</ul>`
+		: "";
+
+	return `<li>${parseBlocks({ block: { block: item.content }, did })}${children}</li>`;
 }

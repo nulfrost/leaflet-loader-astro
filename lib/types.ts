@@ -1,4 +1,6 @@
-import type { Agent } from "@atproto/api";
+import type { Client } from "@atcute/client";
+import type { ActorIdentifier } from "@atcute/lexicons";
+import type { XRPCProcedures, XRPCQueries } from "@atcute/lexicons/ambient";
 import type { PubLeafletRichtextFacet } from "./lexicons/index.js";
 
 export interface LiveLeafletLoaderOptions {
@@ -58,16 +60,16 @@ export interface EntryFilter {
 }
 
 export interface GetLeafletDocumentsParams {
-	repo: string;
-	agent: Agent;
+	repo: ActorIdentifier;
+	rpc: Client<XRPCQueries, XRPCProcedures>;
 	cursor?: string;
 	limit?: number;
 	reverse?: boolean;
 }
 
 export interface GetSingleLeafletDocumentParams {
-	repo: string;
-	agent: Agent;
+	repo: ActorIdentifier;
+	rpc: Client<XRPCQueries, XRPCProcedures>;
 	id: string;
 }
 

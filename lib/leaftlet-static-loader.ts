@@ -1,4 +1,4 @@
-import { Agent } from "@atproto/api";
+import { Client, simpleFetchHandler } from "@atcute/client";
 import { isDid } from "@atproto/did";
 import type { Loader, LoaderContext } from "astro/loaders";
 import { LeafletDocumentSchema } from "schema.js";
@@ -7,12 +7,12 @@ import type {
 	StaticLeafletLoaderOptions,
 } from "types.js";
 import {
+	getLeafletDocuments,
+	leafletBlocksToHTML,
+	leafletDocumentRecordToView,
 	LiveLoaderError,
 	resolveMiniDoc,
-	getLeafletDocuments,
 	uriToRkey,
-	leafletDocumentRecordToView,
-	leafletBlocksToHTML,
 } from "utils.js";
 
 export function leafletStaticLoader(
@@ -43,8 +43,9 @@ export function leafletStaticLoader(
 		}: LoaderContext) => {
 			try {
 				logger.info("fetching latest leaflet documents");
-				const pds_url = await resolveMiniDoc(repo);
-				const agent = new Agent({ service: pds_url });
+				const { pds, did } = await resolveMiniDoc(repo);
+				const handler = simpleFetchHandler({ service: pds });
+				const rpc = new Client({ handler });
 
 				let cursor: string | undefined;
 				let count = 0;
@@ -52,7 +53,7 @@ export function leafletStaticLoader(
 				fetching: do {
 					const { documents, cursor: documentsCursor } =
 						await getLeafletDocuments({
-							agent,
+							rpc,
 							repo,
 							cursor,
 							limit: 100,
@@ -83,10 +84,8 @@ export function leafletStaticLoader(
 							digest,
 							rendered: {
 								html: leafletBlocksToHTML({
-									id,
-									uri: document.uri,
-									cid: document.cid,
-									value: document.value as unknown as LeafletDocumentRecord,
+									record: document.value as unknown as LeafletDocumentRecord,
+									did,
 								}),
 							},
 						});
