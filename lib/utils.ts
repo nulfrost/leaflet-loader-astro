@@ -1,8 +1,8 @@
+import type {} from "@atcute/atproto";
 import { is } from "@atcute/lexicons";
 import { AtUri, UnicodeString } from "@atproto/api";
-import sanitizeHTML from "sanitize-html";
-import type {} from "@atcute/atproto";
 import katex from "katex";
+import sanitizeHTML from "sanitize-html";
 import {
 	PubLeafletBlocksCode,
 	PubLeafletBlocksHeader,
@@ -158,7 +158,30 @@ export function leafletBlocksToHTML({
 		allowedAttributes: {
 			"*": ["class", "style"],
 			img: ["src", "height", "width", "alt"],
+			a: ["href", "target", "rel"],
 		},
+		allowedTags: [
+			"img",
+			"pre",
+			"code",
+			"p",
+			"a",
+			"b",
+			"s",
+			"ul",
+			"li",
+			"i",
+			"h1",
+			"h2",
+			"h3",
+			"h4",
+			"h5",
+			"h6",
+			"hr",
+			"div",
+			"span",
+		],
+		selfClosing: ["img"],
 	});
 }
 

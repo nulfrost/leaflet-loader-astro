@@ -1,8 +1,7 @@
-import type { Agent } from "@atproto/api";
+import type { Client } from "@atcute/client";
+import type { ActorIdentifier } from "@atcute/lexicons";
+import type { XRPCProcedures, XRPCQueries } from "@atcute/lexicons/ambient";
 import type { PubLeafletRichtextFacet } from "./lexicons/index.js";
-import { Client } from "@atcute/client";
-import { XRPCProcedures, XRPCQueries } from "@atcute/lexicons/ambient";
-import { ActorIdentifier } from "@atcute/lexicons";
 
 export interface LiveLeafletLoaderOptions {
 	/**

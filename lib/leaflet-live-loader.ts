@@ -1,4 +1,3 @@
-import { AtpAgent } from "@atproto/api";
 import { isDid } from "@atproto/did";
 import type { LiveLoader } from "astro/loaders";
 import type {
