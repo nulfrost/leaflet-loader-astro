@@ -1,6 +1,5 @@
 import { Client, simpleFetchHandler } from "@atcute/client";
 import { isHandle } from "@atcute/lexicons/syntax";
-import { isDid } from "@atproto/did";
 import type { Loader, LoaderContext } from "astro/loaders";
 import { LeafletDocumentSchema } from "schema.js";
 import type {
