@@ -17,9 +17,6 @@ importers:
       '@atproto/api':
         specifier: ^0.16.2
         version: 0.16.2
-      '@atproto/did':
-        specifier: ^0.1.5
-        version: 0.1.5
       katex:
         specifier: ^0.16.22
         version: 0.16.22
@@ -101,9 +98,6 @@ packages:
 
   '@atproto/common-web@0.4.2':
     resolution: {integrity: sha512-vrXwGNoFGogodjQvJDxAeP3QbGtawgZute2ed1XdRO0wMixLk3qewtikZm06H259QDJVu6voKC5mubml+WgQUw==}
-
-  '@atproto/did@0.1.5':
-    resolution: {integrity: sha512-8+1D08QdGE5TF0bB0vV8HLVrVZJeLNITpRTUVEoABNMRaUS7CoYSVb0+JNQDeJIVmqMjOL8dOjvCUDkp3gEaGQ==}
 
   '@atproto/lexicon@0.4.12':
     resolution: {integrity: sha512-fcEvEQ1GpQYF5igZ4IZjPWEoWVpsEF22L9RexxLS3ptfySXLflEyH384e7HITzO/73McDeaJx3lqHIuqn9ulnw==}
@@ -2512,10 +2506,6 @@ snapshots:
       graphemer: 1.4.0
       multiformats: 9.9.0
       uint8arrays: 3.0.0
-      zod: 3.25.76
-
-  '@atproto/did@0.1.5':
-    dependencies:
       zod: 3.25.76
 
   '@atproto/lexicon@0.4.12':
