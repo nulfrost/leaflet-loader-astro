@@ -1,4 +1,5 @@
 import { Client, simpleFetchHandler } from "@atcute/client";
+import { isHandle } from "@atcute/lexicons/syntax";
 import { isDid } from "@atproto/did";
 import type { Loader, LoaderContext } from "astro/loaders";
 import { LeafletDocumentSchema } from "schema.js";
@@ -8,6 +9,7 @@ import type {
 } from "types.js";
 import {
 	getLeafletDocuments,
+	isPlcDid,
 	leafletBlocksToHTML,
 	leafletDocumentRecordToView,
 	LiveLoaderError,
@@ -27,9 +29,15 @@ export function leafletStaticLoader(
 		);
 	}
 
-	// not a valid did
-	if (!isDid(repo)) {
-		throw new LiveLoaderError("invalid did", "INVALID_DID");
+	// not a valid handle, check if valid did
+	if (!isHandle(repo)) {
+		// not a valid handle or did, throw
+		if (!isPlcDid(repo)) {
+			throw new LiveLoaderError(
+				"invalid handle or did",
+				"INVALID_HANDLE_OR_DID",
+			);
+		}
 	}
 
 	return {

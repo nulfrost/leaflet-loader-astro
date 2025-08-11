@@ -1,5 +1,5 @@
 import type {} from "@atcute/atproto";
-import { is } from "@atcute/lexicons";
+import { type Handle, is } from "@atcute/lexicons";
 import { AtUri, UnicodeString } from "@atproto/api";
 import katex from "katex";
 import sanitizeHTML from "sanitize-html";
@@ -14,6 +14,7 @@ import {
 	PubLeafletPagesLinearDocument,
 } from "./lexicons/index.js";
 import type {
+	Did,
 	Facet,
 	GetLeafletDocumentsParams,
 	GetSingleLeafletDocumentParams,
@@ -358,3 +359,10 @@ function renderListItem({
 
 	return `<li>${parseBlocks({ block: { block: item.content }, did })}${children}</li>`;
 }
+
+// yoinked from: https://github.com/mary-ext/atcute/blob/trunk/packages/lexicons/lexicons/lib/syntax/handle.ts
+const PLC_DID_RE = /^did:plc:([a-z2-7]{24})$/;
+
+export const isPlcDid = (input: string): input is Did<"plc"> => {
+	return input.length === 32 && PLC_DID_RE.test(input);
+};

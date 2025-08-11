@@ -78,3 +78,9 @@ export interface RichTextSegment {
 	text: string;
 	facet?: Exclude<Facet["features"], { $type: string }>;
 }
+
+// yoinked from: https://github.com/mary-ext/atcute/blob/trunk/packages/lexicons/lexicons/lib/syntax/handle.ts
+/**
+ * represents a decentralized identifier (DID).
+ */
+export type Did<Method extends string = string> = `did:${Method}:${string}`;

@@ -1,4 +1,5 @@
-import { isDid } from "@atproto/did";
+import { Client, simpleFetchHandler } from "@atcute/client";
+import { isHandle } from "@atcute/lexicons/syntax";
 import type { LiveLoader } from "astro/loaders";
 import type {
 	CollectionFilter,
@@ -10,13 +11,13 @@ import type {
 import {
 	getLeafletDocuments,
 	getSingleLeafletDocument,
+	isPlcDid,
 	leafletBlocksToHTML,
 	leafletDocumentRecordToView,
 	LiveLoaderError,
 	resolveMiniDoc,
 	uriToRkey,
 } from "./utils.js";
-import { Client, simpleFetchHandler } from "@atcute/client";
 
 export function leafletLiveLoader(
 	options: LiveLeafletLoaderOptions,
@@ -35,9 +36,15 @@ export function leafletLiveLoader(
 		);
 	}
 
-	// not a valid did
-	if (!isDid(repo)) {
-		throw new LiveLoaderError("invalid did", "INVALID_DID");
+	// not a valid handle, check if valid did
+	if (!isHandle(repo)) {
+		// not a valid handle or did, throw
+		if (!isPlcDid(repo)) {
+			throw new LiveLoaderError(
+				"invalid handle or did",
+				"INVALID_HANDLE_OR_DID",
+			);
+		}
 	}
 
 	return {
