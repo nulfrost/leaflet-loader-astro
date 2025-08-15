@@ -1,5 +1,11 @@
 # leaflet-loader-astro
 
+## 1.1.1
+
+### Patch Changes
+
+- 8922bb1: Add JSDoc comments for available loader options for leafletStaticLoader and leafletLiveLoader
+
 ## 1.1.0
 
 ### Minor Changes
