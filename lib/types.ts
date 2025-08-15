@@ -5,21 +5,26 @@ import type { PubLeafletRichtextFacet } from "./lexicons/index.js";
 
 export interface LiveLeafletLoaderOptions {
 	/**
-	 * @description Your repo is your DID (did:plc... or did:web...). You can find this information using: https://pdsls.dev
+	 * @description Your repo is your DID (did:plc... or did:web...) or handle (username.bsky.social). You can find this information using: https://pdsls.dev
 	 */
 	repo: string;
 }
 
 export interface StaticLeafletLoaderOptions {
 	/**
-	 * @description Your repo is your DID (did:plc... or did:web...). You can find this information using: https://pdsls.dev
+	 * @description Your repo is your DID (did:plc... or did:web...) or handle (username.bsky.social). You can find this information using: https://pdsls.dev
 	 */
 	repo: string;
-	filter?: string;
 	/**
+	 * @description The number of records leaflet records to return for getCollection, the default being 50. The range can be from 1 to 100.
 	 * @default 50
 	 */
 	limit?: number;
+	/**
+	 * @description Whether or not the records should be returned in reverse order.
+	 * @default undefined
+	 */
+	reverse?: boolean;
 }
 
 export interface LeafletDocumentRecord {

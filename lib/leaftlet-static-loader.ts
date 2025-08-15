@@ -19,7 +19,7 @@ import {
 export function leafletStaticLoader(
 	options: StaticLeafletLoaderOptions,
 ): Loader {
-	const { repo, limit } = options;
+	const { repo, limit, reverse } = options;
 
 	if (!repo || typeof repo !== "string") {
 		throw new LiveLoaderError(
@@ -63,7 +63,8 @@ export function leafletStaticLoader(
 							rpc,
 							repo,
 							cursor,
-							limit: 100,
+							reverse,
+							limit: 50,
 						});
 					for (const document of documents) {
 						if (limit && count >= limit) {
