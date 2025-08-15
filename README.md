@@ -15,8 +15,8 @@ npm install @nulfrost/leaflet-loader-astro
 
 ## Usage
 
-### Build-time loader: leafletStaticLoader (recommended)
-
+<details>
+<summary>Build-time loader: leafletStaticLoader (recommended)</summary>
 ```ts
 // src/content.config.ts
 import { defineCollection, z } from "astro:content";
@@ -81,6 +81,7 @@ const { Content } = await render(document);
 
 <Content />
 ```
+</details>
 
 ### Live loader: leafletLiveLoader
 

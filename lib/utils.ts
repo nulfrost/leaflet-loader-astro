@@ -1,5 +1,5 @@
 import type {} from "@atcute/atproto";
-import { type Handle, is } from "@atcute/lexicons";
+import { is } from "@atcute/lexicons";
 import { AtUri, UnicodeString } from "@atproto/api";
 import katex from "katex";
 import sanitizeHTML from "sanitize-html";

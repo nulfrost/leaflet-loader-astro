@@ -15,11 +15,16 @@ export interface StaticLeafletLoaderOptions {
 	 * @description Your repo is your DID (did:plc... or did:web...). You can find this information using: https://pdsls.dev
 	 */
 	repo: string;
-	filter?: string;
 	/**
+	 * The number of records leaflet records to return for getCollection, the default being 50. The range can be from 1 to 100.
 	 * @default 50
 	 */
 	limit?: number;
+	/**
+	 * Whether or not the records should be returned in reversed order.
+	 * @default undefined
+	 */
+	reverse?: boolean;
 }
 
 export interface LeafletDocumentRecord {
