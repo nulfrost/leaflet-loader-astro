@@ -16,7 +16,8 @@ npm install @nulfrost/leaflet-loader-astro
 ## Usage
 
 <details>
-<summary>Build-time loader: leafletStaticLoader (recommended)</summary>
+<summary>Build-time loader: leafletStaticLoader **(recommended)**</summary>
+
 ```ts
 // src/content.config.ts
 import { defineCollection, z } from "astro:content";
@@ -83,7 +84,8 @@ const { Content } = await render(document);
 ```
 </details>
 
-### Live loader: leafletLiveLoader
+<details>
+<summary>Live loader: leafletLiveLoader</summary>
 
 ```ts
 // astro.config.mjs
@@ -159,6 +161,42 @@ const { Content } = await render(document?.entry);
 
 <Content />
 ```
+
+</details>
+
+## Loader Options
+
+### Static Loader
+
+```ts
+leafletStaticLoader()
+```
+
+`repo`: This can be either your DID (did:plc:qttsv4e7pu2jl3ilanfgc3zn) or your handle (dane.is.extraordinarily.cool)
+
+`limit`: How many leaflet documents to return when calling `getCollection`. The default is 50 and the range is from 1 to 100.
+
+`reverse`: Whether or not to return the leaflet documents in reverse order. By default this is false.
+
+### Live Loader
+
+```ts
+leafletLiveLoader()
+```
+
+`repo`: This can be either your DID (did:plc:qttsv4e7pu2jl3ilanfgc3zn) or your handle (dane.is.extraordinarily.cool)
+
+> [!NOTE]
+> `getLiveCollection` supports a second argument where you can add additional filters, similar to the options you have access to for `leafletStaticLoader`
+
+```ts
+getLiveCollection()
+```
+
+`limit`: How many leaflet documents to return when calling `getCollection`. The default is 50 and the range is from 1 to 100.
+
+`reverse`: Whether or not to return the leaflet documents in reverse order. By default this is false.
+
 
 ## License
 
