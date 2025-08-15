@@ -24,7 +24,7 @@ import { defineCollection, z } from "astro:content";
 import { leafletStaticLoader } from "@nulfrost/leaflet-loader-astro";
 
 const documents = defineCollection({
-	loader: leafletStaticLoader({ repo: "did:plc:qttsv4e7pu2jl3ilanfgc3zn" }),
+	loader: leafletStaticLoader({ repo: "did:plc:qttsv4e7pu2jl3ilanfgc3zn" }), // or repo: dane.is.extraordinarily.cool
 });
 
 export const collections = { documents };
@@ -107,7 +107,7 @@ import { defineLiveCollection, z } from "astro:content";
 import { leafletLiveLoader } from "@nulfrost/leaflet-loader-astro";
 
 const documents = defineLiveCollection({
-	loader: leafletLiveLoader({ repo: "did:plc:qttsv4e7pu2jl3ilanfgc3zn" }),
+	loader: leafletLiveLoader({ repo: "did:plc:qttsv4e7pu2jl3ilanfgc3zn" }), // or repo: dane.is.extraordinarily.cool
 });
 
 export const collections = { documents };
