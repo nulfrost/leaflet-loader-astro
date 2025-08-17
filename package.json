@@ -12,7 +12,7 @@
 	"bugs": {
 		"url": "https://github.com/nulfrost/leaflet-loader-astro/issues"
 	},
-	"author": "Dane Miller",
+	"author": "Dane Miller <me@dane.computer>",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/nulfrost/leaflet-loader-astro.git"
