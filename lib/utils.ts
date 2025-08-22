@@ -246,7 +246,7 @@ export class RichText {
 	}
 }
 
-function parseTextBlock(block: PubLeafletBlocksText.Main) {
+export function parseTextBlock(block: PubLeafletBlocksText.Main) {
 	let html = "";
 	const rt = new RichText({
 		text: block.plaintext,
@@ -297,7 +297,7 @@ function parseTextBlock(block: PubLeafletBlocksText.Main) {
 	return html.trim();
 }
 
-function parseBlocks({
+export function parseBlocks({
 	block,
 	did,
 }: {
