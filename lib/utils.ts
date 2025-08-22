@@ -358,7 +358,7 @@ export function parseBlocks({
 	return html.trim();
 }
 
-function renderListItem({
+export function renderListItem({
 	item,
 	did,
 }: {
