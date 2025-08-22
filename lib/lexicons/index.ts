@@ -1,4 +1,5 @@
 export * as ComAtprotoRepoStrongRef from "./types/com/atproto/repo/strongRef.js";
+export * as PubLeafletBlocksBlockquote from "./types/pub/leaflet/blocks/blockquote.js";
 export * as PubLeafletBlocksCode from "./types/pub/leaflet/blocks/code.js";
 export * as PubLeafletBlocksHeader from "./types/pub/leaflet/blocks/header.js";
 export * as PubLeafletBlocksHorizontalRule from "./types/pub/leaflet/blocks/horizontalRule.js";

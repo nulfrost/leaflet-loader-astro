@@ -12,3 +12,7 @@ test("should pass if valid at uri is passed in", () => {
 		),
 	).toBe("3lvl7m6jd4s2e");
 });
+
+test("should not pass if invalid uri is passed in", () => {
+	expect(() => uriToRkey("invalid")).toThrowError(/failed to get rkey/i);
+});

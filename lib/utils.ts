@@ -4,6 +4,7 @@ import { AtUri, UnicodeString } from "@atproto/api";
 import katex from "katex";
 import sanitizeHTML from "sanitize-html";
 import {
+	PubLeafletBlocksBlockquote,
 	PubLeafletBlocksCode,
 	PubLeafletBlocksHeader,
 	PubLeafletBlocksHorizontalRule,
@@ -182,6 +183,7 @@ export function leafletBlocksToHTML({
 			"hr",
 			"div",
 			"span",
+			"blockquote",
 		],
 		selfClosing: ["img"],
 	});
@@ -244,7 +246,58 @@ export class RichText {
 	}
 }
 
-function parseBlocks({
+export function parseTextBlock(block: PubLeafletBlocksText.Main) {
+	let html = "";
+	const rt = new RichText({
+		text: block.plaintext,
+		facets: block.facets || [],
+	});
+	const children = [];
+	for (const segment of rt.segments()) {
+		const link = segment.facet?.find(
+			(segment) => segment.$type === "pub.leaflet.richtext.facet#link",
+		);
+		const isBold = segment.facet?.find(
+			(segment) => segment.$type === "pub.leaflet.richtext.facet#bold",
+		);
+		const isCode = segment.facet?.find(
+			(segment) => segment.$type === "pub.leaflet.richtext.facet#code",
+		);
+		const isStrikethrough = segment.facet?.find(
+			(segment) => segment.$type === "pub.leaflet.richtext.facet#strikethrough",
+		);
+		const isUnderline = segment.facet?.find(
+			(segment) => segment.$type === "pub.leaflet.richtext.facet#underline",
+		);
+		const isItalic = segment.facet?.find(
+			(segment) => segment.$type === "pub.leaflet.richtext.facet#italic",
+		);
+		if (isCode) {
+			children.push(`<pre><code>${segment.text}</code></pre>`);
+		} else if (link) {
+			children.push(
+				`<a href="${link.uri}" target="_blank" rel="noopener noreferrer">${segment.text}</a>`,
+			);
+		} else if (isBold) {
+			children.push(`<b>${segment.text}</b>`);
+		} else if (isStrikethrough) {
+			children.push(`<s>${segment.text}</s>`);
+		} else if (isUnderline) {
+			children.push(
+				`<span style="text-decoration:underline;">${segment.text}</span>`,
+			);
+		} else if (isItalic) {
+			children.push(`<i>${segment.text}</i>`);
+		} else {
+			children.push(`${segment.text}`);
+		}
+	}
+	html += `<p>${children.join("")}</p>`;
+
+	return html.trim();
+}
+
+export function parseBlocks({
 	block,
 	did,
 }: {
@@ -254,52 +307,7 @@ function parseBlocks({
 	let html = "";
 
 	if (is(PubLeafletBlocksText.mainSchema, block.block)) {
-		const rt = new RichText({
-			text: block.block.plaintext,
-			facets: block.block.facets || [],
-		});
-		const children = [];
-		for (const segment of rt.segments()) {
-			const link = segment.facet?.find(
-				(segment) => segment.$type === "pub.leaflet.richtext.facet#link",
-			);
-			const isBold = segment.facet?.find(
-				(segment) => segment.$type === "pub.leaflet.richtext.facet#bold",
-			);
-			const isCode = segment.facet?.find(
-				(segment) => segment.$type === "pub.leaflet.richtext.facet#code",
-			);
-			const isStrikethrough = segment.facet?.find(
-				(segment) =>
-					segment.$type === "pub.leaflet.richtext.facet#strikethrough",
-			);
-			const isUnderline = segment.facet?.find(
-				(segment) => segment.$type === "pub.leaflet.richtext.facet#underline",
-			);
-			const isItalic = segment.facet?.find(
-				(segment) => segment.$type === "pub.leaflet.richtext.facet#italic",
-			);
-			if (isCode) {
-				children.push(`<pre><code>${segment.text}</code></pre>`);
-			} else if (link) {
-				children.push(
-					`<a href="${link.uri}" target="_blank" rel="noopener noreferrer">${segment.text}</a>`,
-				);
-			} else if (isBold) {
-				children.push(`<b>${segment.text}</b>`);
-			} else if (isStrikethrough) {
-				children.push(`<s>${segment.text}</s>`);
-			} else if (isUnderline) {
-				children.push(
-					`<span style="text-decoration:underline;">${segment.text}</span>`,
-				);
-			} else if (isItalic) {
-				children.push(`<i>${segment.text}</i>`);
-			} else {
-				children.push(`${segment.text}`);
-			}
-		}
-		html += `<p>${children.join("")}</p>`;
+		html += parseTextBlock(block.block);
 	}
 
 	if (is(PubLeafletBlocksHeader.mainSchema, block.block)) {
@@ -343,10 +351,14 @@ function parseBlocks({
 		html += `<div><img src="https://cdn.bsky.app/img/feed_fullsize/plain/${did}/${block.block.image.ref.$link}@jpeg" height="${block.block.aspectRatio.height}" width="${block.block.aspectRatio.width}" alt="${block.block.alt}" /></div>`;
 	}
 
+	if (is(PubLeafletBlocksBlockquote.mainSchema, block.block)) {
+		html += `<blockquote>${parseTextBlock(block.block)}</blockquote>`;
+	}
+
 	return html.trim();
 }
 
-function renderListItem({
+export function renderListItem({
 	item,
 	did,
 }: {
