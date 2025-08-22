@@ -1,5 +1,15 @@
 # leaflet-loader-astro
 
+## 1.2.0
+
+### Minor Changes
+
+- f920153: Add support for blockquotes
+
+### Patch Changes
+
+- 8922bb1: Add JSDoc comments for available loader options for leafletStaticLoader and leafletLiveLoader
+
 ## 1.1.0
 
 ### Minor Changes
