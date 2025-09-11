@@ -8,6 +8,7 @@ import {
 	PubLeafletBlocksCode,
 	PubLeafletBlocksHeader,
 	PubLeafletBlocksHorizontalRule,
+	PubLeafletBlocksIframe,
 	PubLeafletBlocksImage,
 	PubLeafletBlocksMath,
 	PubLeafletBlocksText,
@@ -162,6 +163,7 @@ export function leafletBlocksToHTML({
 			"*": ["class", "style"],
 			img: ["src", "height", "width", "alt"],
 			a: ["href", "target", "rel"],
+			iframe: ["height", "allow", "loading", "src"],
 		},
 		allowedTags: [
 			"img",
@@ -184,6 +186,7 @@ export function leafletBlocksToHTML({
 			"div",
 			"span",
 			"blockquote",
+			"iframe",
 		],
 		selfClosing: ["img"],
 	});
@@ -353,6 +356,11 @@ export function parseBlocks({
 
 	if (is(PubLeafletBlocksBlockquote.mainSchema, block.block)) {
 		html += `<blockquote>${parseTextBlock(block.block)}</blockquote>`;
+	}
+
+	if (is(PubLeafletBlocksIframe.mainSchema, block.block)) {
+		// @ts-ignore
+		html += `<iframe height="${block.block.height}" allow="fullscreen" loading="lazy" src="${block.block.url}"></iframe>`;
 	}
 
 	return html.trim();
