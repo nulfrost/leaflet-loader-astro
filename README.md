@@ -197,6 +197,20 @@ getLiveCollection()
 
 `reverse`: Whether or not to return the leaflet documents in reverse order. By default this is false.
 
+## Supported Leaflet Blocks
+
+- [] Bluesky post
+- [] Iframe
+- [x] Horizontal Rule
+- [x] Unordered List
+- [x] Math
+- [x] Code
+- [] Website
+- [x] Image
+- [x] Blockquote
+- [x] Text
+- [x] Header
+- [x] List Item
 
 ## License
 
