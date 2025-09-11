@@ -1,5 +1,11 @@
 # leaflet-loader-astro
 
+## 1.3.0
+
+### Minor Changes
+
+- eb3bc4b: Add iframe block
+
 ## 1.2.0
 
 ### Minor Changes
