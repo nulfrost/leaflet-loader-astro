@@ -200,7 +200,7 @@ getLiveCollection()
 ## Supported Leaflet Blocks
 
 - [ ] Bluesky post
-- [ ] Iframe
+- [x] Iframe
 - [x] Horizontal Rule
 - [x] Unordered List
 - [x] Math
